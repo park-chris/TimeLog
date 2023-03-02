@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/watch_fragment"
+        android:title="@string/timer"
+        android:icon="@drawable/ic_timer" />
+
+    <item
+        android:id="@+id/history_fragment"
+        android:title="@string/history"
+        android:icon="@drawable/ic_history" />
+
+    <item
+        android:id="@+id/monitoring_fragment"
+        android:title="@string/monitoring"
+        android:icon="@drawable/ic_insights" />
+
+    <item
+        android:id="@+id/settings_fragment"
+        android:title="@string/settings"
+        android:icon="@drawable/ic_settings" />
+
+</menu>

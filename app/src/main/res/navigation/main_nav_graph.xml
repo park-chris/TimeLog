@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/timer_fragment"
+    android:id="@+id/main_nav_graph">
+
+
+    <keep_state_fragment
+        android:id="@+id/timer_fragment"
+        android:name="com.crystal.android.timeisgoldre.timer.TimerFragment"
+        app:popUpToSaveState="true"
+        tools:layout="@layout/fragment_timer"
+        android:label="TimerFragment" />
+
+    <keep_state_fragment
+        android:id="@+id/monitoring_fragment"
+        android:name="com.crystal.android.timeisgoldre.monitoring.MonitoringFragment"
+        app:popUpToSaveState="true"
+        tools:layout="@layout/fragment_monitoring"
+        android:label="MonitoringFragment" />
+
+    <keep_state_fragment
+        android:id="@+id/history_fragment"
+        android:name="com.crystal.android.timeisgoldre.history.HistoryFragment"
+        app:popUpToSaveState="true"
+        tools:layout="@layout/fragment_history"
+        android:label="HistoryFragment" />
+
+    <keep_state_fragment
+        android:id="@+id/settings_fragment"
+        android:name="com.crystal.android.timeisgoldre.settings.SettingsFragment"
+        app:popUpToSaveState="true"
+        tools:layout="@layout/fragment_settings"
+        android:label="SettingsFragment" />
+
+</navigation>
