@@ -1,4 +1,5 @@
-package com.crystal.android.timeisgoldre
+package com.crystal.android.timeisgoldre.custom
+
 
 import android.content.Context
 import android.os.Bundle

@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.crystal.android.timeisgoldre.custom.KeepStateFragment
 import com.crystal.android.timeisgoldre.databinding.ActivityMainBinding
+import com.crystal.android.timeisgoldre.timer.TimerFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,8 +16,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
         _binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         setNavigation()

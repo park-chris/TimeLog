@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.crystal.android.timeisgoldre.R
@@ -45,6 +46,17 @@ class TimerFragment: Fragment() {
     }
 
     private fun setupEvents() {
+
+        binding.textView.setOnClickListener {
+            Toast.makeText(
+                requireContext(),
+                "onClicked",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            Log.d(TAG, "timerfragment onClicked")
+        }
+
 
     }
 
