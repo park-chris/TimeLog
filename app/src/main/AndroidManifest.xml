@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:name=".LaunchApplication"
-        android:theme="@style/Theme.TimeIsGoldRe"
+        android:theme="@style/Theme.TimeIsGold"
         tools:targetApi="31">
         <activity
             android:name="com.crystal.android.timeisgold.MainActivity"

@@ -7,7 +7,7 @@ import java.util.*
 @Entity
 data class Record(
     @PrimaryKey
-    val id: UUID = UUID.randomUUID(),
+    var id: UUID = UUID.randomUUID(),
     var type: String = "",
     var date: Date = Date(),
     var created: String = "",

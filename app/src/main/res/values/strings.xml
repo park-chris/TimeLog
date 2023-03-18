@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TimeIsGoldRe</string>
+    <string name="app_name">TimeIsGold</string>
     <string name="timer">타이머</string>
     <string name="history">기록</string>
     <string name="monitoring">모니터링</string>
