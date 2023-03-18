@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="CircularDeterminateProgressBar">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:progressDrawable">@drawable/circular</item>
+    </style>
+
+    <style name="TimerButton" parent="Widget.AppCompat.ImageButton">
+        <item name="android:tint">@color/white</item>
+        <item name="android:height">50dp</item>
+        <item name="android:width">50dp</item>
+        <item name="backgroundTint">@color/button_click_false</item>
+        <item name="android:layout_margin">20dp</item>
+    </style>
+
+</resources>

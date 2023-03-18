@@ -1,4 +1,4 @@
-package com.crystal.android.timeisgoldre.custom
+package com.crystal.android.timeisgold.custom
 
 
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.crystal.android.timeisgoldre.monitoring
+package com.crystal.android.timeisgold.history
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.crystal.android.timeisgoldre.R
-import com.crystal.android.timeisgoldre.databinding.FragmentMonitoringBinding
+import com.crystal.android.timeisgold.R
+import com.crystal.android.timeisgold.databinding.FragmentHistoryBinding
 
-class MonitoringFragment: Fragment() {
+class HistoryFragment: Fragment() {
 
-    private var _binding: FragmentMonitoringBinding? = null
+    private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -19,7 +19,7 @@ class MonitoringFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_monitoring, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_history, container, false)
 
         setValues()
         return binding.root

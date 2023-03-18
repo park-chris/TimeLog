@@ -1,18 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-
     android:layout_height="match_parent">
 
+
+    <ProgressBar
+        android:id="@+id/timerProgress"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:indeterminateDrawable="@drawable/circular"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/timer"
-        android:textSize="24sp"
+        android:id="@+id/timerText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="00:00:00"
+        android:gravity="center"
+        android:textSize="35sp"
         android:textStyle="bold"
-        android:gravity="center" />
+        android:textColor="@color/green"
+        app:layout_constraintStart_toStartOf="@id/timerProgress"
+        app:layout_constraintEnd_toEndOf="@id/timerProgress"
+        app:layout_constraintTop_toTopOf="@id/timerProgress"
+        app:layout_constraintBottom_toBottomOf="@id/timerProgress" />
+
+    <ImageButton
+        android:id="@+id/resetButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        style="@style/TimerButton"
+        app:layout_constraintTop_toBottomOf="@+id/timerProgress"
+        app:layout_constraintEnd_toStartOf="@id/operatorButton"
+        android:src="@drawable/ic_reset" />
+
+    <ImageButton
+        android:id="@+id/operatorButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        style="@style/TimerButton"
+        app:layout_constraintTop_toBottomOf="@+id/timerProgress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_play" />
+
+    <ImageButton
+        android:id="@+id/saveButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        style="@style/TimerButton"
+        app:layout_constraintTop_toBottomOf="@+id/timerProgress"
+        app:layout_constraintStart_toEndOf="@id/operatorButton"
+        android:src="@drawable/ic_note_add" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

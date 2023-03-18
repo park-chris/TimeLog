@@ -1,4 +1,4 @@
-package com.crystal.android.timeisgoldre.settings
+package com.crystal.android.timeisgold.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.crystal.android.timeisgoldre.R
-import com.crystal.android.timeisgoldre.databinding.FragmentSettingsBinding
+import com.crystal.android.timeisgold.R
+import com.crystal.android.timeisgold.databinding.FragmentSettingsBinding
 
 class SettingsFragment: Fragment() {
 

@@ -1,13 +1,12 @@
-package com.crystal.android.timeisgoldre
+package com.crystal.android.timeisgold
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.crystal.android.timeisgoldre.custom.KeepStateFragment
-import com.crystal.android.timeisgoldre.databinding.ActivityMainBinding
-import com.crystal.android.timeisgoldre.timer.TimerFragment
+import com.crystal.android.timeisgold.custom.KeepStateFragment
+import com.crystal.android.timeisgold.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +19,14 @@ class MainActivity : AppCompatActivity() {
 
         setNavigation()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     // navigation settings
@@ -35,36 +42,6 @@ class MainActivity : AppCompatActivity() {
         navController.setGraph(R.navigation.main_nav_graph)
 
         binding.mainNavi.setupWithNavController(navController)
-
-
-/*
-        binding.mainNavi.setOnItemSelectedListener {
-
-            when (it.itemId) {
-                R.id.timer_fragment -> {
-                    navController.navigate(R.id.timer_fragment)
-                    true
-                }
-
-                R.id.history_fragment -> {
-                    navController.navigate(R.id.history_fragment)
-                    true
-                }
-
-                R.id.monitoring_fragment -> {
-                    navController.navigate(R.id.monitoring_fragment)
-                    true
-                }
-
-                R.id.settings_fragment -> {
-                    navController.navigate(R.id.settings_fragment)
-                    true
-                }
-
-                else -> false
-            }
-        }
-*/
 
     }
 }

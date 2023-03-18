@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="title_text">16sp</dimen>
-    <dimen name="layout_left_padding">10dp</dimen>
-    <dimen name="layout_right_padding">10dp</dimen>
+    <dimen name="layout_left_padding">8dp</dimen>
+    <dimen name="layout_right_padding">8dp</dimen>
+
+    <dimen name="button_text">16sp</dimen>
+    <dimen name="button_height">30dp</dimen>
 </resources>

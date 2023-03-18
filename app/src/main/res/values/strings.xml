@@ -4,4 +4,19 @@
     <string name="history">기록</string>
     <string name="monitoring">모니터링</string>
     <string name="settings">설정</string>
+
+    <!--action-->
+    <string name="ok">확인</string>
+    <string name="cancel">취소</string>
+    <string name="finish">종료</string>
+    <string name="save">저장</string>
+
+    <!--dialog-->
+    <string name="timer_reset_title">타이머 초기화</string>
+    <string name="timer_reset_message">확인을 누르면 타이머가 초기화됩니다.</string>
+
+    <!-- timer notification-->
+    <string name="timer_notification_title">타이머</string>
+    <string name="timer_notification_content">%2d:%2d:%2d</string>
+
 </resources>

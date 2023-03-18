@@ -7,7 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="grey">#8F8F8F</color>
     <color name="beige">#FFF9F9FC</color>
     <color name="white_pink">#E3DBEE</color>
     <color name="pastel_violet">#BCC3DB</color>
@@ -16,11 +15,7 @@
     <color name="deep_green_blue">#3B8085</color>
     <color name="green">#22695C</color>
     <color name="deep_green">#082032</color>
-    <color name="timer_start">#37CFB3</color>
-    <color name="timer_center">#22695C</color>
-    <color name="timer_end">#082032</color>
-    <color name="button_click_false">#3B8085</color>
-    <color name="button_click_true">#37CFB3</color>
-    <color name="dialog_background">#272727</color>
-
+    <color name="timer_start"></color>
+    <color name="timer_center"></color>
+    <color name="timer_end"></color>
 </resources>
