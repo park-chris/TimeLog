@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +24,7 @@ import com.crystal.android.timeisgold.record.RecordViewModel
 import com.crystal.android.timeisgold.util.CustomDialog
 import com.crystal.android.timeisgold.util.ServiceUtil
 import com.crystal.android.timeisgold.util.UIUtil
+import java.lang.IllegalArgumentException
 import java.util.*
 
 private const val TAG = "TimerFragment"
@@ -110,7 +112,6 @@ class TimerFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        requireActivity().unregisterReceiver(receiver)
         _binding = null
     }
 
@@ -220,7 +221,10 @@ class TimerFragment : Fragment() {
     }
 
     private fun save() {
-        date ?: return
+        if (second == 0L || date == null) {
+            Toast.makeText(requireContext(), "기록이 측정되지 않았습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
         val endDate = Calendar.getInstance().time
         val dialog = RecordInfoDialogFragment.newInstance(second, date!!, endDate,"")
         dialog.show(requireActivity().supportFragmentManager, "RecordInfoDialogFragment")

@@ -19,4 +19,18 @@
     <string name="timer_notification_title">타이머</string>
     <string name="timer_notification_content">%02d:%02d:%02d</string>
 
+    <!-- recordInfoDialogFragment-->
+    <string name="choice_type">항목을 선택해주세요.</string>
+    <string name="back_title">뒤로가기</string>
+    <string name="back_message">확인을 클릭하면 기록이 저장되지 않은 채 뒤로 가집니다.</string>
+    <string name="no_list">목록이 없습니다.</string>
+    <string name="type_edit_text_toast">항목 이름은 한 글자 이상입니다.</string>
+    <string name="type_add_toast">이미 생성된 항목입니다.</string>
+    <string name="input_type_name">항목 이름을 입력하세요.</string>
+    <string name="no_search_result">검색 결과가 없습니다.</string>
+    <string name="duration">소요시간</string>
+    <string name="break_time">휴식시간</string>
+    <string name="memo">메모</string>
+    <string name="write_memo">메모를 입력해주세요.</string>
+
 </resources>

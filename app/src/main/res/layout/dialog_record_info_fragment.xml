@@ -30,7 +30,7 @@
         android:id="@+id/typeButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="항목 없음"
+        android:text="@string/choice_type"
         android:backgroundTint="@color/button_color"
         style="@style/Widget.AppCompat.Button.Colored"
         android:textSize="25sp"
@@ -50,7 +50,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/typeButton"
-        android:text="2022/03/04 13:30"
         android:layout_marginStart="@dimen/layout_left_padding"
         android:layout_marginEnd="@dimen/layout_right_padding"
         android:layout_marginTop="10dp" />
@@ -74,7 +73,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="2022/03/04 13:30"
         android:layout_marginStart="@dimen/layout_left_padding"
         android:layout_marginEnd="@dimen/layout_right_padding"
         android:layout_marginBottom="10dp"
@@ -99,7 +97,7 @@
             android:id="@+id/text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Duration"
+            android:text="@string/duration"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -113,14 +111,13 @@
             app:layout_constraintTop_toTopOf="parent"
             android:textSize="30sp"
             android:textStyle="bold"
-            android:gravity="end"
-            android:text="00:00:00" />
+            android:gravity="end"/>
 
         <TextView
             android:id="@+id/text3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="break"
+            android:text="@string/break_time"
             android:layout_marginTop="10dp"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -136,8 +133,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginTop="10dp"
-            android:gravity="end"
-            android:text="00:00:01" />
+            android:gravity="end"/>
 
 
         <com.google.android.material.divider.MaterialDivider
@@ -153,7 +149,7 @@
             android:id="@+id/text2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Memo"
+            android:text="@string/memo"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="10dp"
@@ -163,7 +159,7 @@
             android:id="@+id/memoEditText"
             android:layout_width="match_parent"
             android:gravity="top"
-            android:hint="메모를 입력해주세요."
+            android:hint="@string/write_memo"
             android:inputType="textMultiLine"
             android:backgroundTint="@android:color/transparent"
             android:layout_height="0dp"
