@@ -9,10 +9,8 @@ data class Record(
     @PrimaryKey
     var id: UUID = UUID.randomUUID(),
     var type: String = "",
-    var date: Date = Date(),
-    var created: String = "",
+    var startDate: Date = Date(),
+    var endDate: Date = Date(),
     var durationTime: Long = 0,
     var memo: String = ""
-) {
-
-}
+)

@@ -17,6 +17,6 @@
 
     <!-- timer notification-->
     <string name="timer_notification_title">타이머</string>
-    <string name="timer_notification_content">%2d:%2d:%2d</string>
+    <string name="timer_notification_content">%02d:%02d:%02d</string>
 
 </resources>

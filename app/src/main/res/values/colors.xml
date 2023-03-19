@@ -24,9 +24,11 @@
     <color name="timer_center">#22695C</color>
     <color name="timer_end">#082032</color>
 
-    <color name="button_click_false">#3B8085</color>
-    <color name="button_click_true">#37CFB3</color>
+    <color name="button_color">#22695C</color>
 
     <color name="dialog_background">#272727</color>
+
+    <color name="record_info_background">#F8F8F8</color>
+
 
 </resources>

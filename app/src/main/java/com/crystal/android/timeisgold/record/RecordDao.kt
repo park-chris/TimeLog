@@ -9,16 +9,16 @@ import java.util.*
 @Dao
 interface RecordDao {
 
-    @Query("SELECT * FROM record ORDER BY date DESC")
+    @Query("SELECT * FROM record ORDER BY startDate DESC")
     fun getRecords(): LiveData<List<Record>>
 
     @Query("SELECT * FROM record WHERE id=(:id)")
     fun getRecord(id: UUID): LiveData<Record?>
 
-    @Query("SELECT sum(durationTime) FROM record WHERE created = date('now', 'localtime') AND type=(:type)")
+    @Query("SELECT sum(durationTime) FROM record WHERE startDate = date('now', 'localtime') AND type=(:type)")
     fun getTime(type: String): Int
 
-    @Query("SELECT * FROM record WHERE created BETWEEN date('now', 'start of day', '-8 days') AND date('now', 'start of day', '-1 day') ORDER BY date DESC")
+    @Query("SELECT * FROM record WHERE startDate BETWEEN date('now', 'start of day', '-8 days') AND date('now', 'start of day', '-1 day') ORDER BY startDate DESC")
     fun getDailyTime(): LiveData<List<Record>>
 
     @Update

@@ -10,7 +10,7 @@
         <item name="android:tint">@color/white</item>
         <item name="android:height">50dp</item>
         <item name="android:width">50dp</item>
-        <item name="backgroundTint">@color/button_click_false</item>
+        <item name="backgroundTint">@color/button_color</item>
         <item name="android:layout_margin">20dp</item>
     </style>
 
@@ -30,7 +30,7 @@
         <item name="color">@color/basic_opposite_color</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:padding">5dp</item>
+        <item name="android:padding">10dp</item>
     </style>
 
 </resources>

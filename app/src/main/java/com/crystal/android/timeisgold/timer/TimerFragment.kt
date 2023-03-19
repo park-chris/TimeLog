@@ -13,24 +13,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
-import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.crystal.android.timeisgold.R
 import com.crystal.android.timeisgold.custom.RecordInfoDialogFragment
-import com.crystal.android.timeisgold.data.Record
 import com.crystal.android.timeisgold.databinding.FragmentTimerBinding
 import com.crystal.android.timeisgold.record.RecordViewModel
 import com.crystal.android.timeisgold.util.CustomDialog
 import com.crystal.android.timeisgold.util.ServiceUtil
 import com.crystal.android.timeisgold.util.UIUtil
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import java.lang.StringBuilder
-import java.sql.Date
-import java.sql.Time
+import java.util.*
 
 private const val TAG = "TimerFragment"
 
@@ -43,10 +36,6 @@ class TimerFragment : Fragment() {
     private var isPlaying = false
     private var second: Long = 0
     private var date: Date? = null
-
-    private val recordViewModel: RecordViewModel by lazy {
-        ViewModelProvider(this).get(RecordViewModel::class.java)
-    }
 
     private var receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -121,6 +110,7 @@ class TimerFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        requireActivity().unregisterReceiver(receiver)
         _binding = null
     }
 
@@ -166,8 +156,6 @@ class TimerFragment : Fragment() {
 
     private fun start() {
 
-        date = Date(System.currentTimeMillis())
-
         if (ServiceUtil.isServiceRunning(requireContext(), TimerService::class.java)) {
             val intent = Intent(TimerService.ACTION_START)
             requireActivity().sendBroadcast(intent)
@@ -178,6 +166,7 @@ class TimerFragment : Fragment() {
             } else {
                 requireActivity().startService(intent)
             }
+            date = Calendar.getInstance().time
         }
             binding.operatorButton.setImageResource(R.drawable.ic_pause)
             timerAnimation.start()
@@ -231,16 +220,9 @@ class TimerFragment : Fragment() {
     }
 
     private fun save() {
-        val record = Record()
-
         date ?: return
-        val dialog = RecordInfoDialogFragment.newInstance(second, date!!)
+        val endDate = Calendar.getInstance().time
+        val dialog = RecordInfoDialogFragment.newInstance(second, date!!, endDate,"")
         dialog.show(requireActivity().supportFragmentManager, "RecordInfoDialogFragment")
-        
-
-/*        recordViewModel.addRecord(record)
-        record.date = date!!
-        record.durationTime = second
-        recordViewModel.saveRecord(record)*/
     }
 }
