@@ -6,17 +6,16 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.crystal.android.timeisgold.R
-import com.crystal.android.timeisgold.adapter.TypeAdapter
 import com.crystal.android.timeisgold.data.Record
 import com.crystal.android.timeisgold.databinding.DialogRecordInfoFragmentBinding
 import com.crystal.android.timeisgold.record.RecordViewModel
@@ -24,15 +23,17 @@ import com.crystal.android.timeisgold.util.ContextUtil
 import com.crystal.android.timeisgold.util.CustomDialog
 import com.crystal.android.timeisgold.util.DateUtil
 import com.crystal.android.timeisgold.util.UIUtil
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class RecordInfoDialogFragment: DialogFragment() {
+class RecordInfoDialogFragment : DialogFragment() {
 
     private var _binding: DialogRecordInfoFragmentBinding? = null
     private val binding get() = _binding!!
-    private  var duration: Long = 0
+    private var duration: Long = 0
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private lateinit var memo: String
@@ -58,7 +59,12 @@ class RecordInfoDialogFragment: DialogFragment() {
         private const val RECORD_MEMO = "record_memo"
         private const val RECORD_UID = "record_uid"
 
-        fun newInstance(duration: Long, startDate: Date, endDate:Date, memo: String): DialogFragment {
+        fun newInstance(
+            duration: Long,
+            startDate: Date,
+            endDate: Date,
+            memo: String
+        ): DialogFragment {
             val fragment = RecordInfoDialogFragment()
             val args = Bundle()
             args.putLong(RECORD_DURATION, duration)
@@ -91,8 +97,8 @@ class RecordInfoDialogFragment: DialogFragment() {
         memo = arguments?.getString(RECORD_MEMO) ?: ""
 
 
-        startDate =  Date(argsStartDate)
-        endDate =  Date(argsEndDate)
+        startDate = Date(argsStartDate)
+        endDate = Date(argsEndDate)
     }
 
     override fun onStart() {
@@ -162,7 +168,8 @@ class RecordInfoDialogFragment: DialogFragment() {
         memo = binding.memoEditText.text.toString()
 
         if (!typeIsSelected) {
-            Toast.makeText(requireContext(), getString(R.string.choice_type), Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.choice_type), Toast.LENGTH_SHORT)
+                .show()
             return
         }
         val type = binding.typeButton.text.toString()
@@ -187,7 +194,13 @@ class RecordInfoDialogFragment: DialogFragment() {
             override fun onNegativeClick() {
             }
         })
-        dialog.start(getString(R.string.back_title), getString(R.string.back_message), getString(R.string.ok), getString(R.string.cancel), true)
+        dialog.start(
+            getString(R.string.back_title),
+            getString(R.string.back_message),
+            getString(R.string.ok),
+            getString(R.string.cancel),
+            true
+        )
     }
 
     private fun updateUI() {
@@ -196,7 +209,7 @@ class RecordInfoDialogFragment: DialogFragment() {
         binding.startDateText.text = DateUtil.dateToString(startDate)
         binding.endDateText.text = DateUtil.dateToString(endDate)
 
-        val breakTime = ((endDate.time - startDate.time ) / 1000) - duration
+        val breakTime = ((endDate.time - startDate.time) / 1000) - duration
 
         if (breakTime > 0) {
             binding.breakText.text = UIUtil.getDurationTime(breakTime)
@@ -204,7 +217,9 @@ class RecordInfoDialogFragment: DialogFragment() {
             binding.breakText.text = getString(R.string.timer_notification_content, 0, 0, 0)
         }
 
-        if (memo.isNotEmpty()) { binding.memoEditText.setText(memo) }
+        if (memo.isNotEmpty()) {
+            binding.memoEditText.setText(memo)
+        }
     }
 
     private fun hideKeyboard() {
@@ -220,61 +235,70 @@ class RecordInfoDialogFragment: DialogFragment() {
 
         val typeEditText: EditText = dialog.findViewById(R.id.typeEditText)
         val addTypeButton: ImageButton = dialog.findViewById(R.id.addTypeButton)
-        val typeRecyclerView: RecyclerView = dialog.findViewById(R.id.typeRecyclerView)
-        val searchEditText: EditText = dialog.findViewById(R.id.searchEditText)
-        val searchButton: ImageButton = dialog.findViewById(R.id.searchButton)
+        val chipGroup: ChipGroup = dialog.findViewById(R.id.chipGroup)
 
         typeList = ContextUtil.getTypeListPref(requireContext())
-
-        typeRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-        val adapter = TypeAdapter(requireContext())
-        adapter.setOnItemClickListener(object : TypeAdapter.OnItemClickListener {
-            override fun onItemClick(view: View, type: String) {
-                binding.typeButton.text = type
-                typeIsSelected = true
-                dialog.dismiss()
-            }
-        })
-        typeRecyclerView.adapter = adapter
 
         if (typeList.isEmpty()) {
             Toast.makeText(requireContext(), getString(R.string.no_list), Toast.LENGTH_SHORT).show()
         } else {
-            adapter.differ.submitList(typeList)
+            for (string in typeList) {
+                val chip = Chip(requireContext()).apply {
+                    text = string
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener {
+                        chipGroup.removeView(this)
+                        typeList.remove(text)
+                        ContextUtil.setTypeListPref(requireContext(), typeList)
+                    }
+                    setOnClickListener {
+                        binding.typeButton.text = text
+                        typeIsSelected = true
+                        dialog.dismiss()
+                    }
+                }
+                chipGroup.addView(chip)
+                chipGroup.invalidate()
+            }
+
         }
 
         addTypeButton.setOnClickListener {
             val inputString = typeEditText.text.toString()
 
             if (inputString.isEmpty()) {
-                Toast.makeText(requireContext(), getString(R.string.type_edit_text_toast), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.type_edit_text_toast),
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 if (typeList.contains(inputString)) {
-                    Toast.makeText(requireContext(), getString(R.string.type_add_toast), Toast.LENGTH_SHORT).show()
-                }else {
-                    typeList.add(0, inputString)
-                    ContextUtil.setTypeListPref(requireContext(), typeList)
-                    val newList = arrayListOf<String>()
-                    newList.addAll(typeList)
-                    adapter.differ.submitList(newList)
-                }
-            }
-        }
-
-        searchButton.setOnClickListener {
-            val inputString = searchEditText.text.toString()
-
-            if (inputString.isEmpty()) {
-                Toast.makeText(requireContext(), getString(R.string.input_type_name), Toast.LENGTH_SHORT).show()
-            } else {
-                val newList = arrayListOf<String>()
-                newList.addAll(typeList)
-
-                val index = newList.indexOf(inputString)
-                if (index >= 0) {
-                    typeRecyclerView.smoothScrollToPosition(index)
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.type_add_toast),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
-                    Toast.makeText(requireContext(), getString(R.string.no_search_result), Toast.LENGTH_SHORT).show()
+                    typeList.add(0, inputString)
+
+                    val chip = Chip(requireContext()).apply {
+                        text = inputString
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener {
+                            chipGroup.removeView(this)
+                        }
+                        setOnClickListener {
+                            binding.typeButton.text = text
+                            typeIsSelected = true
+                            dialog.dismiss()
+                        }
+                    }
+
+                    ContextUtil.setTypeListPref(requireContext(), typeList)
+                    chipGroup.addView(chip, 0)
+                    chipGroup.invalidate()
+
                 }
             }
         }
@@ -290,5 +314,6 @@ class RecordInfoDialogFragment: DialogFragment() {
 
         dialog.show()
     }
+
 
 }
