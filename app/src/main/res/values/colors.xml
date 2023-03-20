@@ -20,6 +20,8 @@
     <color name="basic_color">#FFFFFFFF</color>
     <color name="basic_opposite_color">#FF000000</color>
 
+    <color name="container_color">#F8F8F8</color>
+
     <color name="timer_start">#37CFB3</color>
     <color name="timer_center">#22695C</color>
     <color name="timer_end">#082032</color>
