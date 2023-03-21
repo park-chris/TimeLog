@@ -32,5 +32,6 @@
 
     <color name="record_info_background">#F8F8F8</color>
 
+    <color name="highlight_color">#22695C</color>
 
 </resources>

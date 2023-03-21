@@ -104,18 +104,27 @@ class TimerService : Service() {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+        val pendingIntent: PendingIntent
+        val closePendingIntent: PendingIntent
+        val closeIntent = Intent().apply {
+            action = ACTION_CLOSE
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, 0 or PendingIntent.FLAG_MUTABLE)
+            closePendingIntent = PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE)
+        } else {
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+            closePendingIntent = PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
-        val closeIntent = Intent()
-        closeIntent.action = ACTION_CLOSE
-        val closePendingIntent: PendingIntent =
-            PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT)
 
         notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID_TIMER)
             .setSmallIcon(R.drawable.ic_app_logo_foreground)
             .setContentTitle(getString(R.string.timer_notification_title))
-            .setContentText(getString(R.string.timer_notification_title, 0,0,0) )
+            .setContentText(getString(R.string.timer_notification_content, 0,0,0) )
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setOngoing(true)
@@ -164,7 +173,6 @@ class TimerService : Service() {
         val intent = Intent(ACTION_UPDATE)
         intent.putExtra(TIMER_VALUE, second)
         sendBroadcast(intent)
-
     }
 
     private fun startTimer() {

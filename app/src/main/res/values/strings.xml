@@ -33,4 +33,13 @@
     <string name="memo">메모</string>
     <string name="write_memo">메모를 입력해주세요.</string>
 
+    <!-- Calendar day of week -->
+    <string name="calendar_monday">Mon</string>
+    <string name="calendar_tuesday">Tue</string>
+    <string name="calendar_wednesday">Wed</string>
+    <string name="calendar_thursday">Thu</string>
+    <string name="calendar_friday">Fri</string>
+    <string name="calendar_saturday">Sat</string>
+    <string name="calendar_sunday">Sun</string>
+
 </resources>
