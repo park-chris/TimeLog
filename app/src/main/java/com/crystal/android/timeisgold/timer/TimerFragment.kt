@@ -75,11 +75,15 @@ class TimerFragment : Fragment() {
         val dateLong = savedInstanceState?.getLong("start_time", 0) ?: 0
         date = Date(dateLong)
 
+        val intent = Intent(TimerService.ACTION_MOVE_TO_BACKGROUND)
+        requireActivity().sendBroadcast(intent)
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
+        val intent = Intent(TimerService.ACTION_MOVE_TO_FOREGROUND)
+        requireActivity().sendBroadcast(intent)
         requireActivity().applicationContext.unregisterReceiver(receiver)
     }
 

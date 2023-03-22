@@ -15,7 +15,22 @@
     <color name="deep_green_blue">#3B8085</color>
     <color name="green">#22695C</color>
     <color name="deep_green">#082032</color>
-    <color name="timer_start"></color>
-    <color name="timer_center"></color>
-    <color name="timer_end"></color>
+
+    <color name="basic_color">#FF000000</color>
+    <color name="basic_opposite_color">#FFFFFFFF</color>
+
+    <color name="container_color">#8F8F8F</color>
+
+    <color name="timer_start">#37CFB3</color>
+    <color name="timer_center">#22695C</color>
+    <color name="timer_end">#082032</color>
+
+    <color name="button_color">#22695C</color>
+
+    <color name="dialog_background">#272727</color>
+
+    <color name="record_info_background">#8F8F8F</color>
+
+    <color name="highlight_color">#22695C</color>
+
 </resources>

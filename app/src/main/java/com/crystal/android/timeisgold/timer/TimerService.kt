@@ -31,6 +31,8 @@ class TimerService : Service() {
         const val ACTION_UPDATE = "action_update"
         const val ACTION_PAUSE = "action_pause"
         const val ACTION_START = "action_start"
+        const val ACTION_MOVE_TO_FOREGROUND = "action_move_to_foreground"
+        const val ACTION_MOVE_TO_BACKGROUND = "action_move_to_background"
 
         const val TIMER_VALUE = "timer_value"
     }
@@ -61,6 +63,12 @@ class TimerService : Service() {
                 ACTION_START -> {
                     startTimer()
                 }
+                ACTION_MOVE_TO_BACKGROUND -> {
+                    moveToBackground()
+                }
+                ACTION_MOVE_TO_FOREGROUND -> {
+                    moveToForeground()
+                }
             }
         }
     }
@@ -77,9 +85,6 @@ class TimerService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        Log.d(TAG, "onTaskRemoved")
-
-        applicationContext.unregisterReceiver(receiver)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -96,6 +101,7 @@ class TimerService : Service() {
         val intent = Intent(ACTION_CLOSE)
         intent.putExtra(TIMER_VALUE, second)
         sendBroadcast(intent)
+        applicationContext.unregisterReceiver(receiver)
         stopSelf()
     }
 
@@ -147,26 +153,18 @@ class TimerService : Service() {
         intentFilter.addAction(ACTION_UPDATE)
         intentFilter.addAction(ACTION_PAUSE)
         intentFilter.addAction(ACTION_START)
+        intentFilter.addAction(ACTION_MOVE_TO_BACKGROUND)
+        intentFilter.addAction(ACTION_MOVE_TO_FOREGROUND)
         applicationContext.registerReceiver(receiver, intentFilter)
 
         val notification = notificationBuilder!!.build()
 
         notificationManager!!.notify(NOTIFICATION_ID_TIMER, notification)
 
-        startForeground(NOTIFICATION_ID_TIMER, notification)
     }
 
     private fun updateNotificationUI(time: Long) {
         notificationBuilder!!.setContentText(UIUtil.getDurationTime(time))
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID_TIMER,
-                CHANNEL_NAME_TIMER,
-                NotificationManager.IMPORTANCE_LOW
-            )
-            notificationManager!!.createNotificationChannel(channel)
-        }
 
         notificationManager!!.notify(NOTIFICATION_ID_TIMER, notificationBuilder!!.build())
 
@@ -182,5 +180,20 @@ class TimerService : Service() {
             updateNotificationUI(second)
         }
     }
+
+    private fun moveToBackground() {
+        Log.d(TAG, "moveToBackground")
+
+        stopForeground(true)
+    }
+
+    private fun moveToForeground() {
+        Log.d(TAG, "moveToForeGround")
+
+        val notification = notificationBuilder!!.build()
+        startForeground(NOTIFICATION_ID_TIMER, notification)
+
+    }
+
 
 }
