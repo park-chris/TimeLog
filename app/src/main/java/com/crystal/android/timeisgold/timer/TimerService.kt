@@ -26,13 +26,18 @@ private const val TAG = "TimerServiceLog"
 class TimerService : Service() {
 
     companion object {
-        const val ACTION_CLOSE = "action_close"
-        const val ACTION_SAVE = "action_save"
-        const val ACTION_UPDATE = "action_update"
-        const val ACTION_PAUSE = "action_pause"
+
+        // Service actions
         const val ACTION_START = "action_start"
+        const val ACTION_RESET = "action_reset"
+        const val ACTION_PAUSE = "action_pause"
         const val ACTION_MOVE_TO_FOREGROUND = "action_move_to_foreground"
         const val ACTION_MOVE_TO_BACKGROUND = "action_move_to_background"
+        const val STATUS_TIMER = "status_timer"
+
+        // Activity actions
+        const val ACTION_UPDATE = "action_update"
+        const val ACTION_CLOSE = "action_close"
 
         const val TIMER_VALUE = "timer_value"
     }
@@ -41,24 +46,17 @@ class TimerService : Service() {
     private var notificationManager: NotificationManager? = null
     private var timer: Timer? = null
     private var second: Long = 0
+    private var isTimerRunning: Boolean = false
     private var receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                ACTION_CLOSE -> {
-                    Log.d(TAG, "action close!!")
-                    timer?.cancel()
-                    notificationManager?.cancel(NOTIFICATION_ID_TIMER)
-                    stopSelf()
-                }
-                ACTION_SAVE -> {
-                    Log.d(TAG, "action save!!")
-                }
-                ACTION_UPDATE -> {
-                    //
+                ACTION_RESET -> {
+                    reset()
                 }
                 ACTION_PAUSE -> {
                     timer?.cancel()
                     timer = null
+                    pause()
                 }
                 ACTION_START -> {
                     startTimer()
@@ -77,18 +75,11 @@ class TimerService : Service() {
         return null
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
-        initNotification()
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+        setReceiver()
+        createChannel()
+        getNotificationManager()
         startTimer()
 
         return super.onStartCommand(intent, flags, startId)
@@ -98,14 +89,43 @@ class TimerService : Service() {
         super.onDestroy()
         timer?.cancel()
         notificationManager?.cancel(NOTIFICATION_ID_TIMER)
-        val intent = Intent(ACTION_CLOSE)
+ /*       val intent = Intent(ACTION_CLOSE)
         intent.putExtra(TIMER_VALUE, second)
-        sendBroadcast(intent)
+        sendBroadcast(intent)*/
         applicationContext.unregisterReceiver(receiver)
         stopSelf()
     }
 
-    private fun initNotification() {
+    private fun setReceiver() {
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(ACTION_UPDATE)
+        intentFilter.addAction(ACTION_START)
+        intentFilter.addAction(ACTION_MOVE_TO_BACKGROUND)
+        intentFilter.addAction(ACTION_MOVE_TO_FOREGROUND)
+        intentFilter.addAction(STATUS_TIMER)
+        applicationContext.registerReceiver(receiver, intentFilter)
+    }
+
+    private fun createChannel() {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID_TIMER,
+                CHANNEL_NAME_TIMER,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            channel.setSound(null, null)
+            channel.setShowBadge(true)
+            notificationManager!!.createNotificationChannel(channel)
+        }
+    }
+
+    private fun getNotificationManager() {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    private fun buildNotification(): Notification {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
@@ -130,69 +150,70 @@ class TimerService : Service() {
         notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID_TIMER)
             .setSmallIcon(R.drawable.ic_app_logo_foreground)
             .setContentTitle(getString(R.string.timer_notification_title))
-            .setContentText(getString(R.string.timer_notification_content, 0,0,0) )
+            .setContentText(UIUtil.getDurationTime(second))
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_close, getString(R.string.finish), closePendingIntent)
 
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID_TIMER,
-                CHANNEL_NAME_TIMER,
-                NotificationManager.IMPORTANCE_LOW
-            )
-            notificationManager!!.createNotificationChannel(channel)
-        }
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(ACTION_CLOSE)
-        intentFilter.addAction(ACTION_SAVE)
-        intentFilter.addAction(ACTION_UPDATE)
-        intentFilter.addAction(ACTION_PAUSE)
-        intentFilter.addAction(ACTION_START)
-        intentFilter.addAction(ACTION_MOVE_TO_BACKGROUND)
-        intentFilter.addAction(ACTION_MOVE_TO_FOREGROUND)
-        applicationContext.registerReceiver(receiver, intentFilter)
-
-        val notification = notificationBuilder!!.build()
-
-        notificationManager!!.notify(NOTIFICATION_ID_TIMER, notification)
-
+        return notificationBuilder!!.build()
     }
 
-    private fun updateNotificationUI(time: Long) {
-        notificationBuilder!!.setContentText(UIUtil.getDurationTime(time))
+    private fun updateNotification() {
+        notificationManager!!.notify(NOTIFICATION_ID_TIMER, buildNotification())
+    }
 
-        notificationManager!!.notify(NOTIFICATION_ID_TIMER, notificationBuilder!!.build())
+    private fun reset() {
+        isTimerRunning = false
+        second = 0
+        timer?.cancel()
+        notificationManager?.cancel(NOTIFICATION_ID_TIMER)
+        stopSelf()
+    }
 
-        val intent = Intent(ACTION_UPDATE)
-        intent.putExtra(TIMER_VALUE, second)
-        sendBroadcast(intent)
+    private fun pause() {
+        isTimerRunning = false
+        timer?.cancel()
     }
 
     private fun startTimer() {
+        isTimerRunning = true
         timer = Timer()
         timer = timer(initialDelay = 0, period = 1000) {
             second++
-            updateNotificationUI(second)
+            val intent = Intent(ACTION_UPDATE)
+            intent.putExtra(TIMER_VALUE, second)
+            sendBroadcast(intent)
+        }
+    }
+
+    private fun startTimerForeground() {
+        isTimerRunning = true
+        timer = Timer()
+        timer = timer(initialDelay = 0, period = 1000) {
+            second++
+            updateNotification()
         }
     }
 
     private fun moveToBackground() {
-        Log.d(TAG, "moveToBackground")
-
+        timer?.cancel()
+        startTimer()
         stopForeground(true)
     }
 
     private fun moveToForeground() {
-        Log.d(TAG, "moveToForeGround")
-
-        val notification = notificationBuilder!!.build()
-        startForeground(NOTIFICATION_ID_TIMER, notification)
-
+        timer?.cancel()
+        if (isTimerRunning) {
+            startTimerForeground()
+            startForeground(
+                NOTIFICATION_ID_TIMER,
+                buildNotification()
+            )
+        } else {
+            reset()
+        }
     }
 
 

@@ -21,6 +21,9 @@ import com.crystal.android.timeisgold.R
 import com.crystal.android.timeisgold.custom.RecordInfoDialogFragment
 import com.crystal.android.timeisgold.databinding.FragmentTimerBinding
 import com.crystal.android.timeisgold.record.RecordViewModel
+import com.crystal.android.timeisgold.timer.TimerService.Companion.ACTION_CLOSE
+import com.crystal.android.timeisgold.timer.TimerService.Companion.STATUS_TIMER
+import com.crystal.android.timeisgold.timer.TimerService.Companion.TIMER_VALUE
 import com.crystal.android.timeisgold.util.CustomDialog
 import com.crystal.android.timeisgold.util.ServiceUtil
 import com.crystal.android.timeisgold.util.UIUtil
@@ -45,13 +48,9 @@ class TimerFragment : Fragment() {
                 TimerService.ACTION_CLOSE -> {
                     reset()
                 }
-                TimerService.ACTION_SAVE -> {
-                }
                 TimerService.ACTION_UPDATE -> {
                     second = intent.getLongExtra(TimerService.TIMER_VALUE, 0)
                     updateUI()
-                }
-                TimerService.ACTION_PAUSE -> {
                 }
             }
         }
@@ -68,23 +67,17 @@ class TimerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerReceiver()
-
         second = savedInstanceState?.getLong(TimerService.TIMER_VALUE) ?: 0
         isPlaying = savedInstanceState?.getBoolean("isPlaying", false) ?: false
         val dateLong = savedInstanceState?.getLong("start_time", 0) ?: 0
         date = Date(dateLong)
 
-        val intent = Intent(TimerService.ACTION_MOVE_TO_BACKGROUND)
-        requireActivity().sendBroadcast(intent)
-
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        val intent = Intent(TimerService.ACTION_MOVE_TO_FOREGROUND)
-        requireActivity().sendBroadcast(intent)
-        requireActivity().applicationContext.unregisterReceiver(receiver)
+
+        requireActivity().unregisterReceiver(receiver)
     }
 
     override fun onCreateView(
@@ -104,7 +97,17 @@ class TimerFragment : Fragment() {
             timerAnimation.start()
         }
 
+
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        registerReceiver()
+
+        val intent = Intent(TimerService.ACTION_MOVE_TO_BACKGROUND)
+        requireActivity().sendBroadcast(intent)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -112,6 +115,15 @@ class TimerFragment : Fragment() {
 
         setupEvents()
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        val intent = Intent(TimerService.ACTION_MOVE_TO_FOREGROUND)
+        requireActivity().sendBroadcast(intent)
+
+        requireActivity().unregisterReceiver(receiver)
     }
 
     override fun onDestroyView() {
@@ -149,9 +161,9 @@ class TimerFragment : Fragment() {
     }
 
     private fun reset() {
-        val intent = Intent(requireContext().applicationContext, TimerService::class.java)
         timerAnimation.cancel()
-        requireActivity().stopService(intent)
+        val intent = Intent(TimerService.ACTION_RESET)
+        requireActivity().sendBroadcast(intent)
         binding.operatorButton.setImageResource(R.drawable.ic_play)
         binding.timerText.text = getString(R.string.timer_notification_content, 0,0,0)
         second = 0
@@ -165,12 +177,8 @@ class TimerFragment : Fragment() {
             val intent = Intent(TimerService.ACTION_START)
             requireActivity().sendBroadcast(intent)
         } else {
-            val intent = Intent(requireContext().applicationContext, TimerService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            requireActivity().startForegroundService(intent)
-            } else {
-                requireActivity().startService(intent)
-            }
+            val intent = Intent(requireContext(), TimerService::class.java)
+            requireActivity().startService(intent)
             date = Calendar.getInstance().time
         }
             binding.operatorButton.setImageResource(R.drawable.ic_pause)
@@ -217,11 +225,8 @@ class TimerFragment : Fragment() {
     private fun registerReceiver() {
         val intentFilter = IntentFilter()
         intentFilter.addAction(TimerService.ACTION_CLOSE)
-        intentFilter.addAction(TimerService.ACTION_SAVE)
         intentFilter.addAction(TimerService.ACTION_UPDATE)
-        intentFilter.addAction(TimerService.ACTION_PAUSE)
-        intentFilter.addAction(TimerService.ACTION_START)
-        requireActivity().applicationContext.registerReceiver(receiver, intentFilter)
+        requireActivity().registerReceiver(receiver, intentFilter)
     }
 
     private fun save() {

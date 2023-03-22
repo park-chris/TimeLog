@@ -22,9 +22,9 @@
 
     <color name="container_color">#F8F8F8</color>
 
-    <color name="timer_start">#37CFB3</color>
+    <color name="timer_start">#082032</color>
     <color name="timer_center">#22695C</color>
-    <color name="timer_end">#082032</color>
+    <color name="timer_end">#37CFB3</color>
 
     <color name="button_color">#22695C</color>
 
