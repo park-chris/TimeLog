@@ -120,10 +120,8 @@ class TimerFragment : Fragment() {
     override fun onPause() {
         super.onPause()
 
-        if (isPlaying) {
-            val intent: Intent = Intent(TimerService.ACTION_MOVE_TO_FOREGROUND)
-            requireActivity().sendBroadcast(intent)
-        }
+        val intent: Intent = Intent(TimerService.ACTION_MOVE_TO_FOREGROUND)
+        requireActivity().sendBroadcast(intent)
 
         requireActivity().unregisterReceiver(receiver)
     }
