@@ -7,7 +7,6 @@ class ContextUtil {
     companion object {
         private val prefName = "timeIsGoldPref"
         private const val TYPE_TAG = "type_tag"
-
         fun setTypeListPref(context: Context,list: ArrayList<String>) {
 
             val jsonArr = JSONArray()

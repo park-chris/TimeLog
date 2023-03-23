@@ -20,10 +20,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.crystal.android.timeisgold.R
 import com.crystal.android.timeisgold.custom.RecordInfoDialogFragment
 import com.crystal.android.timeisgold.databinding.FragmentTimerBinding
-import com.crystal.android.timeisgold.record.RecordViewModel
-import com.crystal.android.timeisgold.timer.TimerService.Companion.ACTION_CLOSE
-import com.crystal.android.timeisgold.timer.TimerService.Companion.STATUS_TIMER
-import com.crystal.android.timeisgold.timer.TimerService.Companion.TIMER_VALUE
 import com.crystal.android.timeisgold.util.CustomDialog
 import com.crystal.android.timeisgold.util.ServiceUtil
 import com.crystal.android.timeisgold.util.UIUtil
@@ -96,6 +92,11 @@ class TimerFragment : Fragment() {
             timerAnimation.start()
         }
 
+        if (!ServiceUtil.isServiceRunning(requireContext(), TimerService::class.java)) {
+            binding.operatorButton.setImageResource(R.drawable.ic_play)
+            timerAnimation.cancel()
+            isPlaying = false
+        }
 
         return binding.root
     }
@@ -119,8 +120,10 @@ class TimerFragment : Fragment() {
     override fun onPause() {
         super.onPause()
 
-        val intent = Intent(TimerService.ACTION_MOVE_TO_FOREGROUND)
-        requireActivity().sendBroadcast(intent)
+        if (isPlaying) {
+            val intent: Intent = Intent(TimerService.ACTION_MOVE_TO_FOREGROUND)
+            requireActivity().sendBroadcast(intent)
+        }
 
         requireActivity().unregisterReceiver(receiver)
     }
@@ -176,7 +179,12 @@ class TimerFragment : Fragment() {
             requireActivity().sendBroadcast(intent)
         } else {
             val intent = Intent(requireContext(), TimerService::class.java)
+            if (second != 0L) {
+                intent.putExtra(TimerService.TIMER_VALUE, second)
+            }
+
             requireActivity().startService(intent)
+
             date = Calendar.getInstance().time
         }
 

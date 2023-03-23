@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.crystal.android.timeisgold.MainActivity
 import com.crystal.android.timeisgold.R
+import com.crystal.android.timeisgold.util.ContextUtil
 import com.crystal.android.timeisgold.util.UIUtil
 import java.util.*
 import kotlin.concurrent.timer
@@ -51,13 +52,12 @@ class TimerService : Service() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_CLOSE -> {
-                    reset()
+                    close()
                 }
                 ACTION_RESET -> {
                     reset()
                 }
                 ACTION_PAUSE -> {
-
                     pause()
                 }
                 ACTION_START -> {
@@ -78,6 +78,8 @@ class TimerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+        second = intent?.getLongExtra(TIMER_VALUE, 0L) ?: 0L
 
         setReceiver()
         createChannel()
@@ -135,17 +137,19 @@ class TimerService : Service() {
         }
         val pendingIntent: PendingIntent
 
+/*
         val closePendingIntent: PendingIntent
-        val closeIntent = Intent(ACTION_MOVE_TO_BACKGROUND).apply {
+        val closeIntent = Intent(ACTION_CLOSE).apply {
             action = ACTION_CLOSE
         }
+*/
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             pendingIntent = PendingIntent.getActivity(this, 0, intent, 0 or PendingIntent.FLAG_MUTABLE)
-            closePendingIntent = PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE)
+           // closePendingIntent = PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE)
         } else {
             pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-            closePendingIntent = PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+            //closePendingIntent = PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT)
         }
 
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -159,7 +163,7 @@ class TimerService : Service() {
             .setSound(defaultSoundUri)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
-            .addAction(R.drawable.ic_close, getString(R.string.finish), closePendingIntent)
+            //.addAction(R.drawable.ic_close, getString(R.string.finish), closePendingIntent)
 
         return notificationBuilder!!.build()
     }
@@ -176,6 +180,17 @@ class TimerService : Service() {
         stopSelf()
     }
 
+    private fun close() {
+        isTimerRunning = false
+        second = 0
+        timer?.cancel()
+        notificationManager?.cancel(NOTIFICATION_ID_TIMER)
+
+        val intent = Intent(ACTION_CLOSE)
+        sendBroadcast(intent)
+        stopSelf()
+    }
+
     private fun pause() {
         timer?.cancel()
         timer = null
@@ -185,26 +200,34 @@ class TimerService : Service() {
     private fun startTimer() {
         isTimerRunning = true
         timer = Timer()
-        timer = timer(initialDelay = 0, period = 1000) {
-            second++
-            val intent = Intent(ACTION_UPDATE)
-            intent.putExtra(TIMER_VALUE, second)
-            sendBroadcast(intent)
-        }
+        timer!!.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                second++
+                val intent = Intent(ACTION_UPDATE)
+                intent.putExtra(TIMER_VALUE, second)
+                sendBroadcast(intent)
+            }
+
+        }, 0, 1000)
+
     }
 
     private fun startTimerForeground() {
         isTimerRunning = true
         timer = Timer()
-        timer = timer(initialDelay = 0, period = 1000) {
-            second++
-            updateNotification()
-        }
+        timer!!.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                second++
+                updateNotification()
+            }
+        }, 0, 1000)
     }
 
     private fun moveToBackground() {
         timer?.cancel()
-        startTimer()
+        if (isTimerRunning) {
+            startTimer()
+        }
         stopForeground(true)
     }
 
@@ -217,7 +240,7 @@ class TimerService : Service() {
                 buildNotification()
             )
         } else {
-            reset()
+           reset()
         }
     }
 
