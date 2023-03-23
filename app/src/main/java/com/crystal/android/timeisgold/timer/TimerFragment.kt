@@ -77,7 +77,6 @@ class TimerFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        requireActivity().unregisterReceiver(receiver)
     }
 
     override fun onCreateView(
@@ -172,7 +171,6 @@ class TimerFragment : Fragment() {
     }
 
     private fun start() {
-
         if (ServiceUtil.isServiceRunning(requireContext(), TimerService::class.java)) {
             val intent = Intent(TimerService.ACTION_START)
             requireActivity().sendBroadcast(intent)
@@ -181,6 +179,7 @@ class TimerFragment : Fragment() {
             requireActivity().startService(intent)
             date = Calendar.getInstance().time
         }
+
             binding.operatorButton.setImageResource(R.drawable.ic_pause)
             timerAnimation.start()
             isPlaying = true

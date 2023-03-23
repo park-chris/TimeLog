@@ -50,12 +50,14 @@ class TimerService : Service() {
     private var receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
+                ACTION_CLOSE -> {
+                    reset()
+                }
                 ACTION_RESET -> {
                     reset()
                 }
                 ACTION_PAUSE -> {
-                    timer?.cancel()
-                    timer = null
+
                     pause()
                 }
                 ACTION_START -> {
@@ -100,9 +102,11 @@ class TimerService : Service() {
         val intentFilter = IntentFilter()
         intentFilter.addAction(ACTION_UPDATE)
         intentFilter.addAction(ACTION_START)
+        intentFilter.addAction(ACTION_RESET)
+        intentFilter.addAction(ACTION_CLOSE)
+        intentFilter.addAction(ACTION_PAUSE)
         intentFilter.addAction(ACTION_MOVE_TO_BACKGROUND)
         intentFilter.addAction(ACTION_MOVE_TO_FOREGROUND)
-        intentFilter.addAction(STATUS_TIMER)
         applicationContext.registerReceiver(receiver, intentFilter)
     }
 
@@ -129,10 +133,10 @@ class TimerService : Service() {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
-
         val pendingIntent: PendingIntent
+
         val closePendingIntent: PendingIntent
-        val closeIntent = Intent().apply {
+        val closeIntent = Intent(ACTION_MOVE_TO_BACKGROUND).apply {
             action = ACTION_CLOSE
         }
 
@@ -173,8 +177,9 @@ class TimerService : Service() {
     }
 
     private fun pause() {
-        isTimerRunning = false
         timer?.cancel()
+        timer = null
+        isTimerRunning = false
     }
 
     private fun startTimer() {
