@@ -19,7 +19,8 @@
     <color name="basic_color">#FF000000</color>
     <color name="basic_opposite_color">#FFFFFFFF</color>
 
-    <color name="container_color">#8F8F8F</color>
+    <color name="container_color">#3C3C3C</color>
+
     <color name="timer_start">#082032</color>
     <color name="timer_center">#22695C</color>
     <color name="timer_end">#37CFB3</color>
@@ -28,7 +29,7 @@
 
     <color name="dialog_background">#272727</color>
 
-    <color name="record_info_background">#8F8F8F</color>
+    <color name="record_info_background">#3C3C3C</color>
 
     <color name="highlight_color">#22695C</color>
 

@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        app:itemBackground="@color/white"
+        app:itemBackground="@color/basic_color"
         app:itemIconTint="@drawable/background_main_menu"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/main_navi_menu" />

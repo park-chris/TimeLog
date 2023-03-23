@@ -120,7 +120,7 @@ class RecordInfoDialogFragment : DialogFragment() {
 
         val view = binding.root
 
-        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.WHITE))
+        dialog?.window?.setBackgroundDrawableResource(R.color.dialog_background)
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
         setValues()
