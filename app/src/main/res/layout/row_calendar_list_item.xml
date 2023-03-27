@@ -2,11 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="10dp"
+    android:padding="2dp"
     android:orientation="vertical"
     android:background="?attr/selectableItemBackgroundBorderless"
     android:gravity="center"
-    android:minWidth="70dp"
+    android:minWidth="55dp"
     android:layout_height="wrap_content">
 
 
@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/grey"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/dayText"
@@ -24,6 +24,6 @@
         android:textStyle="bold"
         android:textColor="@color/grey"
         android:layout_marginTop="10dp"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
 </LinearLayout>

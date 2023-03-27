@@ -34,8 +34,6 @@ class HistoryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Log.d(TAG, "onCreate")
     }
 
     override fun onCreateView(
@@ -46,8 +44,6 @@ class HistoryFragment : Fragment() {
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_history, container, false)
 
         setValues()
-
-        Log.d(TAG, "onCreateView")
 
         return binding.root
     }
@@ -96,9 +92,11 @@ class HistoryFragment : Fragment() {
     private fun initCalendar() {
 
         adapter = CalendarAdapter(requireContext())
-        binding.calendarRecyclerView.layoutManager =
-            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        val layoutManager =             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+
+        binding.calendarRecyclerView.layoutManager = layoutManager
         binding.calendarRecyclerView.adapter = adapter
+
 
         binding.calendarRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -193,18 +191,14 @@ class HistoryFragment : Fragment() {
             val calData = CalendarData(calendar.time, false)
             list.add(calData)
         }
-        Log.d(TAG, "month: ${calendar.get(Calendar.MONTH)} lastDay: ${lastDay} caL: ${calendar}")
 
         adapter!!.differ.submitList(list)
 
-        Log.d(TAG, "calendar: ${adapter!!.differ.currentList.size}")
-
-        // calendarViewModel.updateCurrentDay(date)
     }
 
     private fun updateUI(date: Date) {
         val yearFormat = SimpleDateFormat("yyyy", Locale.getDefault())
-        val monthStringFormat = SimpleDateFormat("MMM", Locale.getDefault())
+        val monthStringFormat = SimpleDateFormat("M", Locale.getDefault())
         binding.monthText.text = monthStringFormat.format(date)
         binding.yearText.text = yearFormat.format(date)
     }
@@ -227,7 +221,7 @@ class HistoryFragment : Fragment() {
 
     }
 
-    private fun scrollToCenter() {
+    private fun scrollToCenter(position: Int) {
 
     }
 }

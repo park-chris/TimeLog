@@ -224,7 +224,15 @@ class TimerFragment : Fragment() {
         }
         if (fragment is TimerFragment) {
             binding.timerText.text = UIUtil.getDurationTime(second)
+            if (!isPlaying) {
+                isPlaying = true
+                binding.operatorButton.setImageResource(R.drawable.ic_pause)
+                timerAnimation.start()
+                isPlaying = true
+            }
         }
+
+
     }
 
     private fun registerReceiver() {
