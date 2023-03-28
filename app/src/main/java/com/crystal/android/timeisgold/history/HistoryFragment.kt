@@ -8,13 +8,16 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.crystal.android.timeisgold.R
 import com.crystal.android.timeisgold.data.CalendarData
+import com.crystal.android.timeisgold.data.Record
 import com.crystal.android.timeisgold.databinding.FragmentHistoryBinding
+import com.crystal.android.timeisgold.record.RecordViewModel
 import com.crystal.android.timeisgold.util.DateUtil
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,10 +30,16 @@ class HistoryFragment : Fragment() {
     private val binding get() = _binding!!
     private val calendarViewModel = CalendarViewModel.getCalendarViewModelInstance()
     private var adapter: CalendarAdapter? = null
+    private lateinit var recordAdapter: RecordAdapter
+    private var records = mutableListOf<Record>()
     private var startLastClickedTime: Long = 0L
     private var endLastClickedTime: Long = 0L
     private var currentDate: Date = Date()
     private var currentDay: Date = Date()
+
+    private val recordViewModel by lazy {
+        ViewModelProvider(requireActivity()).get(RecordViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +70,7 @@ class HistoryFragment : Fragment() {
 
     private fun setValues() {
 
+        initRecords()
         initCalendar()
 
         calendarViewModel.currentDate.observe(viewLifecycleOwner) {
@@ -77,6 +87,14 @@ class HistoryFragment : Fragment() {
                 Log.d(TAG, "update Day : $it")
                 currentDay = it
                 updateSelectedCalendar(it)
+                recordViewModel.loadRecords(it)
+            }
+        }
+
+        recordViewModel.selectedRecordsLiveData.observe(viewLifecycleOwner) {
+            it?.let {
+                Log.d(TAG, "update recordList : $it")
+                updateRecord(it)
             }
         }
     }
@@ -84,7 +102,22 @@ class HistoryFragment : Fragment() {
     private fun setupEvents() {
 
         binding.todayButton.setOnClickListener {
-            Toast.makeText(requireActivity(), "onClicekd", Toast.LENGTH_SHORT).show()
+            val date = Date(1679413985206)
+
+            recordViewModel.loadRecords(date)
+
+        }
+
+        recordViewModel.recordDailyLiveData.observe(viewLifecycleOwner) {
+            it?.let {
+                Log.d(TAG, "list $it")
+            }
+        }
+
+        recordViewModel.recordListLiveData.observe(viewLifecycleOwner) {
+            it?.let {
+                Log.d(TAG, "slist $it")
+            }
         }
 
     }
@@ -148,14 +181,12 @@ class HistoryFragment : Fragment() {
         adapter!!.differ.submitList(dates)
         calendarViewModel.updateCurrentDay(Date())
 
+    }
 
-/*        binding.calendarRecyclerView.scrollToPosition(today - 2)
-
-        val smoothScroller = CenterSmoothScroller(binding.calendarRecyclerView.context)
-
-        smoothScroller.targetPosition = today
-
-        binding.calendarRecyclerView.layoutManager?.startSmoothScroll(smoothScroller)*/
+    private fun initRecords() {
+        recordAdapter = RecordAdapter(requireContext(), records)
+        binding.recordRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recordRecyclerView.adapter = recordAdapter
     }
 
     private fun updateDate(date: Date, previous: Boolean, next: Boolean) {
@@ -175,7 +206,6 @@ class HistoryFragment : Fragment() {
 
         calendarViewModel.updateCurrentDate(calendar.time)
     }
-
 
     private fun updateCalendar(date: Date) {
         val calendar = Calendar.getInstance()
@@ -208,18 +238,21 @@ class HistoryFragment : Fragment() {
   /*      val calendar = Calendar.getInstance()
         calendar.time = date
 */
-        Log.d(TAG, "리스트 사이즈: ${adapter!!.differ.currentList.size}")
-
         val list = adapter!!.differ.currentList.mapIndexed { index, calData ->
             val newItem = calData.copy(
                 isSelected = DateUtil.differDates(calData.date, date)
             )
             newItem
         }
-
         adapter!!.differ.submitList(list)
 
     }
+
+    private fun updateRecord(list: List<Record>) {
+        Log.d(TAG, "updateRecord: $list")
+    }
+
+
 
     private fun scrollToCenter(position: Int) {
 

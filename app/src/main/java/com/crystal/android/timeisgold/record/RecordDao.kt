@@ -21,6 +21,9 @@ interface RecordDao {
     @Query("SELECT * FROM record WHERE startDate BETWEEN date('now', 'start of day', '-8 days') AND date('now', 'start of day', '-1 day') ORDER BY startDate DESC")
     fun getDailyTime(): LiveData<List<Record>>
 
+    @Query("SELECT * FROM record WHERE startDate BETWEEN :startMilliSec AND :endMilliSec ORDER BY startDate ASC")
+    fun getSelectedRecords(startMilliSec: Long, endMilliSec: Long): LiveData<List<Record>>
+
     @Update
     fun updateRecord(record: Record)
 
