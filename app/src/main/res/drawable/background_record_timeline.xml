@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="4dp" android:left="3dp" android:right="3dp">
+        <shape
+            android:shape="rectangle">
+            <size
+                android:width="120dp"
+                android:height="120dp" />
+            <solid
+                android:color="@color/timer_center" />
+        </shape>
+    </item>
+    <item android:width="10dp" android:height="10dp" android:top="15dp">
+        <shape
+            android:shape="oval">
+            <stroke
+                android:width="2dp"
+                android:color="@color/timer_center" />
+            <solid
+                android:color="@color/basic_color" />
+        </shape>
+    </item>
+</layer-list>

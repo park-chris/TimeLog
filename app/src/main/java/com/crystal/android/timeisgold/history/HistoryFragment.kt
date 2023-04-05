@@ -1,10 +1,12 @@
 package com.crystal.android.timeisgold.history
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.TextView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -18,6 +20,7 @@ import com.crystal.android.timeisgold.data.CalendarData
 import com.crystal.android.timeisgold.data.Record
 import com.crystal.android.timeisgold.databinding.FragmentHistoryBinding
 import com.crystal.android.timeisgold.record.RecordViewModel
+import com.crystal.android.timeisgold.util.CustomDialog
 import com.crystal.android.timeisgold.util.DateUtil
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,7 +34,7 @@ class HistoryFragment : Fragment() {
     private val calendarViewModel = CalendarViewModel.getCalendarViewModelInstance()
     private var adapter: CalendarAdapter? = null
     private lateinit var recordAdapter: RecordAdapter
-    private var records = mutableListOf<Record>()
+    private var records = listOf<Record>()
     private var startLastClickedTime: Long = 0L
     private var endLastClickedTime: Long = 0L
     private var currentDate: Date = Date()
@@ -75,7 +78,6 @@ class HistoryFragment : Fragment() {
 
         calendarViewModel.currentDate.observe(viewLifecycleOwner) {
             it?.let {
-                Log.d(TAG, "currentDate: $currentDate")
                 currentDate = it
                 updateCalendar(currentDate)
                 updateUI(currentDate)
@@ -84,7 +86,6 @@ class HistoryFragment : Fragment() {
 
         calendarViewModel.currentDay.observe(viewLifecycleOwner) {
             it?.let {
-                Log.d(TAG, "update Day : $it")
                 currentDay = it
                 updateSelectedCalendar(it)
                 recordViewModel.loadRecords(it)
@@ -93,7 +94,6 @@ class HistoryFragment : Fragment() {
 
         recordViewModel.selectedRecordsLiveData.observe(viewLifecycleOwner) {
             it?.let {
-                Log.d(TAG, "update recordList : $it")
                 updateRecord(it)
             }
         }
@@ -102,22 +102,7 @@ class HistoryFragment : Fragment() {
     private fun setupEvents() {
 
         binding.todayButton.setOnClickListener {
-            val date = Date(1679413985206)
 
-            recordViewModel.loadRecords(date)
-
-        }
-
-        recordViewModel.recordDailyLiveData.observe(viewLifecycleOwner) {
-            it?.let {
-                Log.d(TAG, "list $it")
-            }
-        }
-
-        recordViewModel.recordListLiveData.observe(viewLifecycleOwner) {
-            it?.let {
-                Log.d(TAG, "slist $it")
-            }
         }
 
     }
@@ -184,7 +169,12 @@ class HistoryFragment : Fragment() {
     }
 
     private fun initRecords() {
-        recordAdapter = RecordAdapter(requireContext(), records)
+        recordAdapter = RecordAdapter(requireContext())
+        recordAdapter.setOnItemClickListener(object : RecordAdapter.SetOnItemClickListener {
+            override fun onSelectMenu(record: Record) {
+                showBottomDialog(record)
+            }
+        })
         binding.recordRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recordRecyclerView.adapter = recordAdapter
     }
@@ -235,9 +225,6 @@ class HistoryFragment : Fragment() {
 
     private fun updateSelectedCalendar(date: Date) {
         adapter ?: return
-  /*      val calendar = Calendar.getInstance()
-        calendar.time = date
-*/
         val list = adapter!!.differ.currentList.mapIndexed { index, calData ->
             val newItem = calData.copy(
                 isSelected = DateUtil.differDates(calData.date, date)
@@ -249,10 +236,59 @@ class HistoryFragment : Fragment() {
     }
 
     private fun updateRecord(list: List<Record>) {
-        Log.d(TAG, "updateRecord: $list")
+        val recordList = mutableListOf<Record>()
+        recordList.addAll(list)
+        recordAdapter.differ.submitList(recordList)
+
     }
 
+    private fun showBottomDialog(record: Record) {
 
+        val dialog: Dialog = Dialog(requireActivity())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.bottomsheet_record_menu)
+
+        val deleteText: TextView = dialog.findViewById(R.id.deleteText)
+        val cancelText: TextView = dialog.findViewById(R.id.cancelText)
+
+        cancelText.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        deleteText.setOnClickListener {
+            showDeleteDialog(dialog, record)
+        }
+
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
+        dialog.window?.setGravity(Gravity.BOTTOM)
+        dialog.show()
+
+    }
+
+    private fun showDeleteDialog(bottomSheet: Dialog, record: Record) {
+        val dialog = CustomDialog(requireContext())
+        dialog.setOnClickListener(object : CustomDialog.OnClickEventListener{
+            override fun onPositiveClick() {
+                deleteRecord(record)
+                Toast.makeText(requireContext(), getString(R.string.delete_record_complete), Toast.LENGTH_SHORT).show()
+                bottomSheet.dismiss()
+            }
+
+            override fun onNegativeClick() {
+            }
+        })
+        dialog.start(getString(R.string.delete_record_title), getString(R.string.delete_record_message), getString(R.string.delete), getString(R.string.cancel), true)
+
+    }
+
+    private fun deleteRecord(record: Record) {
+        recordViewModel.deleteRecord(record)
+    }
 
     private fun scrollToCenter(position: Int) {
 

@@ -20,27 +20,59 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class RecordAdapter(
-    private val context: Context,
-    private val list: List<Record>
-): RecyclerView.Adapter<RecordAdapter.ViewHolder>() {
+    private val context: Context
+) : RecyclerView.Adapter<RecordAdapter.ViewHolder>() {
 
-    inner class ViewHolder(private val binding: RecordListItemBinding ): RecyclerView.ViewHolder(binding.root) {
+    interface SetOnItemClickListener {
+        fun onSelectMenu(record: Record)
+    }
+
+    private var listener: SetOnItemClickListener? = null
+
+    fun setOnItemClickListener(listener: SetOnItemClickListener) {
+        this.listener = listener
+    }
+
+    inner class ViewHolder(private val binding: RecordListItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(record: Record) {
-            itemView.setOnClickListener {
+            binding.titleText.text = record.type
+            if (record.memo.isEmpty()) {
+                binding.contentText.text = context.getString(R.string.no_memo)
+            } else {
+                binding.contentText.text = record.memo
+            }
+            binding.startTimeText.text = DateUtil.dateToTimeString(record.startDate)
+            binding.durationTimeText.text = DateUtil.longToDurationTime(record.durationTime)
+
+            binding.menuButton.setOnClickListener {
+                listener?.onSelectMenu(record)
             }
         }
     }
 
+    private val differCallback = object : DiffUtil.ItemCallback<Record>() {
+        override fun areItemsTheSame(oldItem: Record, newItem: Record): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Record, newItem: Record): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    val differ = AsyncListDiffer(this, differCallback)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val inflater = parent.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater =
+            parent.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val binding = RecordListItemBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(list[position])
+        holder.bind(differ.currentList[position])
     }
 
-    override fun getItemCount() = list.size
+    override fun getItemCount() = differ.currentList.size
 
 }

@@ -18,6 +18,27 @@ class DateUtil {
             return formatter.format(date)
         }
 
+        fun dateToTimeString(date: Date): String {
+            val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+            return formatter.format(date).toString()
+        }
+
+        fun longToDurationTime(time: Long): String {
+            val hour: Long
+            val min: Long
+
+            if (time >= 3600) {
+                hour = time / 3600
+                val extra = time % 3600
+                min = extra / 60
+            } else {
+                hour = 0
+                min = time / 60
+            }
+
+            return "${"%02d".format(hour)}:${"%02d".format(min)}"
+        }
+
         fun differDates(date1: Date, date2: Date): Boolean {
             val differ = date1.time - date2.time
             return differ == 0L

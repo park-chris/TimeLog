@@ -10,10 +10,14 @@
     <string name="cancel">취소</string>
     <string name="finish">종료</string>
     <string name="save">저장</string>
+    <string name="delete">삭제</string>
 
     <!--dialog-->
     <string name="timer_reset_title">타이머 초기화</string>
     <string name="timer_reset_message">확인을 누르면 타이머가 초기화됩니다.</string>
+    <string name="delete_record_complete">삭제되었습니다.</string>
+    <string name="delete_record_title">기록 삭제</string>
+    <string name="delete_record_message">정말 해당 기록을 삭제하시겠습니까?</string>
 
     <!-- timer notification-->
     <string name="timer_notification_title">타이머</string>
@@ -32,6 +36,8 @@
     <string name="break_time">휴식시간</string>
     <string name="memo">메모</string>
     <string name="write_memo">메모를 입력해주세요.</string>
+    <string name="no_memo">저장된 메모가 없습니다.</string>
+
 
     <!-- Calendar day of week -->
     <string name="calendar_monday">Mon</string>
