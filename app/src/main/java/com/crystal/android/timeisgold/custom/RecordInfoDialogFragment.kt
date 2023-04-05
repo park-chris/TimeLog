@@ -25,6 +25,7 @@ import com.crystal.android.timeisgold.util.DateUtil
 import com.crystal.android.timeisgold.util.UIUtil
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.internal.ViewUtils.hideKeyboard
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -37,6 +38,7 @@ class RecordInfoDialogFragment : DialogFragment() {
     private lateinit var startDate: Date
     private lateinit var endDate: Date
     private lateinit var memo: String
+    private lateinit var recordId: String
     private var typeList: ArrayList<String> = arrayListOf()
     private var typeIsSelected = false
 
@@ -79,7 +81,7 @@ class RecordInfoDialogFragment : DialogFragment() {
         fun newInstance(recordUid: UUID): DialogFragment {
             val fragment = RecordInfoDialogFragment()
             val args = Bundle()
-            args.putString(RECORD_MEMO, recordUid.toString())
+            args.putString(RECORD_UID, recordUid.toString())
             fragment.arguments = args
 
             return fragment
@@ -91,14 +93,21 @@ class RecordInfoDialogFragment : DialogFragment() {
 
         setStyle(STYLE_NORMAL, R.style.CustomFullDialog)
 
-        duration = arguments?.getLong(RECORD_DURATION) ?: 0
-        val argsStartDate = arguments?.getLong(RECORD_START_DATE) ?: 0
-        val argsEndDate = arguments?.getLong(RECORD_END_DATE) ?: 0
-        memo = arguments?.getString(RECORD_MEMO) ?: ""
+        recordId = arguments?.getString(RECORD_UID) ?: ""
+
+        if (recordId.isNotEmpty()) {
+            recordViewModel.loadRecord(UUID.fromString(recordId))
+        } else {
+            duration = arguments?.getLong(RECORD_DURATION) ?: 0
+            val argsStartDate = arguments?.getLong(RECORD_START_DATE) ?: 0
+            val argsEndDate = arguments?.getLong(RECORD_END_DATE) ?: 0
+            memo = arguments?.getString(RECORD_MEMO) ?: ""
 
 
-        startDate = Date(argsStartDate)
-        endDate = Date(argsEndDate)
+            startDate = Date(argsStartDate)
+            endDate = Date(argsEndDate)
+        }
+
     }
 
     override fun onStart() {
@@ -136,7 +145,21 @@ class RecordInfoDialogFragment : DialogFragment() {
 
     private fun setValues() {
 
-        updateUI()
+
+        if (recordId.isEmpty()) {
+            updateUI()
+        }
+
+        recordViewModel.recordLiveDate.observe(viewLifecycleOwner) {
+            it?.let {
+                duration = it.durationTime
+                memo = it.memo
+                startDate = it.startDate
+                endDate = it.endDate
+                binding.typeButton.text = it.type
+                updateUI()
+            }
+        }
 
     }
 
@@ -165,6 +188,9 @@ class RecordInfoDialogFragment : DialogFragment() {
         /*  새로 record 생성*/
         val record = Record()
 
+
+
+
         memo = binding.memoEditText.text.toString()
 
         if (!typeIsSelected) {
@@ -179,7 +205,13 @@ class RecordInfoDialogFragment : DialogFragment() {
         record.endDate = endDate
         record.memo = memo
         record.type = type
-        recordViewModel.addRecord(record)
+
+        if (recordId.isNotEmpty()) {
+            record.id = UUID.fromString(recordId)
+            recordViewModel.updateRecord(record)
+        } else {
+            recordViewModel.addRecord(record)
+        }
 
         dismiss()
     }

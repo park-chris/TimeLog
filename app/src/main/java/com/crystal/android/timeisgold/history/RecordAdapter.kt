@@ -25,6 +25,7 @@ class RecordAdapter(
 
     interface SetOnItemClickListener {
         fun onSelectMenu(record: Record)
+        fun onClickItem(id: UUID)
     }
 
     private var listener: SetOnItemClickListener? = null
@@ -47,6 +48,9 @@ class RecordAdapter(
 
             binding.menuButton.setOnClickListener {
                 listener?.onSelectMenu(record)
+            }
+            itemView.setOnClickListener {
+                listener?.onClickItem(record.id)
             }
         }
     }

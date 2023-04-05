@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.crystal.android.timeisgold.R
+import com.crystal.android.timeisgold.custom.RecordInfoDialogFragment
 import com.crystal.android.timeisgold.data.CalendarData
 import com.crystal.android.timeisgold.data.Record
 import com.crystal.android.timeisgold.databinding.FragmentHistoryBinding
@@ -173,6 +174,11 @@ class HistoryFragment : Fragment() {
         recordAdapter.setOnItemClickListener(object : RecordAdapter.SetOnItemClickListener {
             override fun onSelectMenu(record: Record) {
                 showBottomDialog(record)
+            }
+
+            override fun onClickItem(id: UUID) {
+                val dialog = RecordInfoDialogFragment.newInstance(id)
+                dialog.show(requireActivity().supportFragmentManager, "RecordInfoDialogFragment")
             }
         })
         binding.recordRecyclerView.layoutManager = LinearLayoutManager(requireContext())

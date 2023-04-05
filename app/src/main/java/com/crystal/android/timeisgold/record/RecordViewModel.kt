@@ -57,7 +57,7 @@ class RecordViewModel: ViewModel() {
         dateLiveData.value = date
     }
 
-    fun saveRecord(record: Record) {
+    fun updateRecord(record: Record) {
         recordRepository.updateRecord(record)
     }
 
