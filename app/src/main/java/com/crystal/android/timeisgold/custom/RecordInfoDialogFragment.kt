@@ -39,6 +39,7 @@ class RecordInfoDialogFragment : DialogFragment() {
     private lateinit var endDate: Date
     private lateinit var memo: String
     private lateinit var recordId: String
+    private var isNew = false
     private var typeList: ArrayList<String> = arrayListOf()
     private var typeIsSelected = false
 
@@ -60,6 +61,7 @@ class RecordInfoDialogFragment : DialogFragment() {
         private const val RECORD_END_DATE = "record_end_date"
         private const val RECORD_MEMO = "record_memo"
         private const val RECORD_UID = "record_uid"
+        private const val NEW_RECORD = "new_record"
 
         fun newInstance(
             duration: Long,
@@ -73,6 +75,7 @@ class RecordInfoDialogFragment : DialogFragment() {
             args.putLong(RECORD_START_DATE, startDate.time)
             args.putLong(RECORD_END_DATE, endDate.time)
             args.putString(RECORD_MEMO, memo)
+            args.putBoolean(NEW_RECORD, true)
             fragment.arguments = args
 
             return fragment
@@ -82,6 +85,7 @@ class RecordInfoDialogFragment : DialogFragment() {
             val fragment = RecordInfoDialogFragment()
             val args = Bundle()
             args.putString(RECORD_UID, recordUid.toString())
+            args.putBoolean(NEW_RECORD, false)
             fragment.arguments = args
 
             return fragment
@@ -95,17 +99,20 @@ class RecordInfoDialogFragment : DialogFragment() {
 
         recordId = arguments?.getString(RECORD_UID) ?: ""
 
-        if (recordId.isNotEmpty()) {
-            recordViewModel.loadRecord(UUID.fromString(recordId))
-        } else {
+        isNew = arguments?.getBoolean(NEW_RECORD) ?: false
+
+        Log.d("testLog", "usNew: $isNew")
+
+        if (isNew) {
             duration = arguments?.getLong(RECORD_DURATION) ?: 0
             val argsStartDate = arguments?.getLong(RECORD_START_DATE) ?: 0
             val argsEndDate = arguments?.getLong(RECORD_END_DATE) ?: 0
             memo = arguments?.getString(RECORD_MEMO) ?: ""
 
-
             startDate = Date(argsStartDate)
             endDate = Date(argsEndDate)
+        } else {
+            recordViewModel.loadRecord(UUID.fromString(recordId))
         }
 
     }
@@ -146,20 +153,23 @@ class RecordInfoDialogFragment : DialogFragment() {
     private fun setValues() {
 
 
-        if (recordId.isEmpty()) {
+        if (isNew) {
             updateUI()
-        }
-
-        recordViewModel.recordLiveDate.observe(viewLifecycleOwner) {
-            it?.let {
-                duration = it.durationTime
-                memo = it.memo
-                startDate = it.startDate
-                endDate = it.endDate
-                binding.typeButton.text = it.type
-                updateUI()
+        } else {
+            recordViewModel.recordLiveDate.observe(viewLifecycleOwner) {
+                it?.let {
+                    duration = it.durationTime
+                    memo = it.memo
+                    startDate = it.startDate
+                    endDate = it.endDate
+                    binding.typeButton.text = it.type
+                    typeIsSelected = true
+                    updateUI()
+                }
             }
         }
+
+
 
     }
 
@@ -187,9 +197,6 @@ class RecordInfoDialogFragment : DialogFragment() {
     private fun saveRecord() {
         /*  새로 record 생성*/
         val record = Record()
-
-
-
 
         memo = binding.memoEditText.text.toString()
 

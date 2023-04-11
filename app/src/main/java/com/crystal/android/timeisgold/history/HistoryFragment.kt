@@ -2,12 +2,14 @@ package com.crystal.android.timeisgold.history
 
 import android.app.Dialog
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -87,6 +89,7 @@ class HistoryFragment : Fragment() {
 
         calendarViewModel.currentDay.observe(viewLifecycleOwner) {
             it?.let {
+                Log.d(TAG, "day: $it")
                 currentDay = it
                 updateSelectedCalendar(it)
                 recordViewModel.loadRecords(it)
@@ -103,7 +106,13 @@ class HistoryFragment : Fragment() {
     private fun setupEvents() {
 
         binding.todayButton.setOnClickListener {
+/*            val today = Date()
+            calendarViewModel.updateCurrentDate(today)
+            calendarViewModel.updateCurrentDay(today)
+            val calendar = Calendar.getInstance()
+            calendar.time = today
 
+            scrollToCenter(calendar.get(Calendar.DAY_OF_MONTH))*/
         }
 
     }
@@ -111,7 +120,7 @@ class HistoryFragment : Fragment() {
     private fun initCalendar() {
 
         adapter = CalendarAdapter(requireContext())
-        val layoutManager =             LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
         binding.calendarRecyclerView.layoutManager = layoutManager
         binding.calendarRecyclerView.adapter = adapter
@@ -167,6 +176,8 @@ class HistoryFragment : Fragment() {
         adapter!!.differ.submitList(dates)
         calendarViewModel.updateCurrentDay(Date())
 
+        scrollToCenter(calendar.get(Calendar.DAY_OF_MONTH))
+
     }
 
     private fun initRecords() {
@@ -214,7 +225,11 @@ class HistoryFragment : Fragment() {
 
         for (i in 1 until lastDay + 1) {
             calendar.set(Calendar.DAY_OF_MONTH, i)
-            val calData = CalendarData(calendar.time, false)
+            val calData = if (DateUtil.differDates(currentDay, date)) {
+                CalendarData(calendar.time, true)
+            } else {
+                CalendarData(calendar.time, false)
+            }
             list.add(calData)
         }
 
@@ -297,6 +312,11 @@ class HistoryFragment : Fragment() {
     }
 
     private fun scrollToCenter(position: Int) {
+
+        val layoutManager = binding.calendarRecyclerView.layoutManager as? LinearLayoutManager
+        layoutManager ?: return
+        val offset = (binding.calendarRecyclerView.width / 2 - (layoutManager.width / layoutManager.itemCount) / 2)
+        layoutManager.scrollToPositionWithOffset(position, offset)
 
     }
 }
