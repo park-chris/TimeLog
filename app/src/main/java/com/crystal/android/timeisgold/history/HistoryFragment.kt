@@ -2,21 +2,19 @@ package com.crystal.android.timeisgold.history
 
 import android.app.Dialog
 import android.graphics.Color
-import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SnapHelper
 import com.crystal.android.timeisgold.R
 import com.crystal.android.timeisgold.custom.RecordInfoDialogFragment
 import com.crystal.android.timeisgold.data.CalendarData
@@ -25,6 +23,7 @@ import com.crystal.android.timeisgold.databinding.FragmentHistoryBinding
 import com.crystal.android.timeisgold.record.RecordViewModel
 import com.crystal.android.timeisgold.util.CustomDialog
 import com.crystal.android.timeisgold.util.DateUtil
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,15 +33,15 @@ class HistoryFragment : Fragment() {
 
     private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
-    private val calendarViewModel = CalendarViewModel.getCalendarViewModelInstance()
     private var adapter: CalendarAdapter? = null
     private lateinit var recordAdapter: RecordAdapter
-    private var records = listOf<Record>()
     private var startLastClickedTime: Long = 0L
     private var endLastClickedTime: Long = 0L
-    private var currentDate: Date = Date()
-    private var currentDay: Date = Date()
+    private var currentCalendarDate: Date = Date()
+    private var currentSelectDay: Date = Date()
+    private var scrollPosition = 0
 
+    private val calendarViewModel = CalendarViewModel.getCalendarViewModelInstance()
     private val recordViewModel by lazy {
         ViewModelProvider(requireActivity()).get(RecordViewModel::class.java)
     }
@@ -79,19 +78,17 @@ class HistoryFragment : Fragment() {
         initRecords()
         initCalendar()
 
-        calendarViewModel.currentDate.observe(viewLifecycleOwner) {
+        calendarViewModel.currentCalendarDate.observe(viewLifecycleOwner) {
             it?.let {
-                Log.d(TAG, "date: $it")
-                currentDate = it
-                updateCalendar(currentDate)
-                updateUI(currentDate)
+                currentCalendarDate = it
+                updateCalendar(currentCalendarDate)
+                updateUI(currentCalendarDate)
             }
         }
 
-        calendarViewModel.currentDay.observe(viewLifecycleOwner) {
+        calendarViewModel.currentSelectDay.observe(viewLifecycleOwner) {
             it?.let {
-                Log.d(TAG, "day: $it")
-                currentDay = it
+                currentSelectDay = it
                 updateSelectedCalendar(it)
                 recordViewModel.loadRecords(it)
             }
@@ -107,32 +104,10 @@ class HistoryFragment : Fragment() {
     private fun setupEvents() {
 
         binding.todayButton.setOnClickListener {
-/*            val today = Date()
-            // calendarViewModel.updateCurrentDate(today)
-            calendarViewModel.updateCurrentDay(today)
             val calendar = Calendar.getInstance()
-            calendar.time = today*/
-
-
-            val calendar = Calendar.getInstance()
-
-            val today = calendar.get(Calendar.DAY_OF_MONTH)
-
-            calendarViewModel.updateCurrentDate(calendar.time)
-
-            val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-            val dates = mutableListOf<CalendarData>()
-
-            for (i in 1 until lastDay + 1) {
-                calendar.set(Calendar.DAY_OF_MONTH, i)
-                val cal = CalendarData(calendar.time, false)
-                dates.add(cal)
-            }
-
-            adapter!!.differ.submitList(dates)
-            calendarViewModel.updateCurrentDay(Date())
-
-            scrollToCenter(today)
+            scrollPosition = calendar.get(Calendar.DAY_OF_MONTH)
+            calendarViewModel.updateCurrentSelect(calendar.time)
+            calendarViewModel.updateCurrentCalendar(calendar.time)
         }
 
     }
@@ -141,12 +116,11 @@ class HistoryFragment : Fragment() {
 
         adapter = CalendarAdapter(requireContext())
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-
         binding.calendarRecyclerView.layoutManager = layoutManager
         binding.calendarRecyclerView.adapter = adapter
 
-
         binding.calendarRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 val startView = recyclerView.getChildAt(0)
                 val endView = recyclerView.getChildAt(binding.calendarRecyclerView.childCount - 1)
@@ -159,7 +133,7 @@ class HistoryFragment : Fragment() {
                     val interval = System.currentTimeMillis() - startLastClickedTime
 
                     if (interval < 1000) {
-                        updateDate(currentDate, previous = true, next = false)
+                        updateDate(currentCalendarDate, previous = true, next = false)
                     }
 
                     startLastClickedTime = System.currentTimeMillis()
@@ -169,7 +143,7 @@ class HistoryFragment : Fragment() {
 
                     val interval = System.currentTimeMillis() - endLastClickedTime
                     if (interval < 1000) {
-                        updateDate(currentDate, previous = false, next = true)
+                        updateDate(currentCalendarDate, previous = false, next = true)
                     }
 
                     endLastClickedTime = System.currentTimeMillis()
@@ -182,9 +156,9 @@ class HistoryFragment : Fragment() {
 
         val calendar = Calendar.getInstance()
 
-        val today = calendar.get(Calendar.DAY_OF_MONTH)
+        scrollPosition = calendar.get(Calendar.DAY_OF_MONTH)
 
-        calendarViewModel.updateCurrentDate(calendar.time)
+        calendarViewModel.updateCurrentCalendar(calendar.time)
 
         val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         val dates = mutableListOf<CalendarData>()
@@ -196,10 +170,7 @@ class HistoryFragment : Fragment() {
         }
 
         adapter!!.differ.submitList(dates)
-        calendarViewModel.updateCurrentDay(Date())
-
-        scrollToCenter(today)
-
+        calendarViewModel.updateCurrentSelect(Date())
     }
 
     private fun initRecords() {
@@ -227,13 +198,15 @@ class HistoryFragment : Fragment() {
             calendar.add(Calendar.MONTH, -1)
             val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
             calendar.set(Calendar.DATE, lastDay)
+            scrollPosition = lastDay - 1
         }
         if (next) {
             calendar.add(Calendar.MONTH, 1)
             calendar.set(Calendar.DATE, 1)
+            scrollPosition = 0
         }
 
-        calendarViewModel.updateCurrentDate(calendar.time)
+        calendarViewModel.updateCurrentCalendar(calendar.time)
     }
 
     private fun updateCalendar(date: Date) {
@@ -244,10 +217,9 @@ class HistoryFragment : Fragment() {
 
         val list = mutableListOf<CalendarData>()
 
-
         for (i in 1 until lastDay + 1) {
             calendar.set(Calendar.DAY_OF_MONTH, i)
-            val calData = if (DateUtil.differDates(currentDay, date)) {
+            val calData = if (DateUtil.differDates(currentSelectDay, calendar.time)) {
                 CalendarData(calendar.time, true)
             } else {
                 CalendarData(calendar.time, false)
@@ -256,6 +228,8 @@ class HistoryFragment : Fragment() {
         }
 
         adapter!!.differ.submitList(list)
+
+        Handler(Looper.getMainLooper()).postDelayed( { scrollToCenter(scrollPosition) }, 100)
 
     }
 
@@ -268,7 +242,7 @@ class HistoryFragment : Fragment() {
 
     private fun updateSelectedCalendar(date: Date) {
         adapter ?: return
-        val list = adapter!!.differ.currentList.mapIndexed { index, calData ->
+        val list = adapter!!.differ.currentList.mapIndexed { _, calData ->
             val newItem = calData.copy(
                 isSelected = DateUtil.differDates(calData.date, date)
             )
@@ -336,12 +310,9 @@ class HistoryFragment : Fragment() {
 
         val layoutManager = binding.calendarRecyclerView.layoutManager as? LinearLayoutManager
         layoutManager ?: return
-        val offset = (binding.calendarRecyclerView.width / 2 - (layoutManager.width / layoutManager.itemCount) / 2)
-
-        Log.d(TAG, "recyclerview w: ${binding.calendarRecyclerView.width} layoutManager w: ${layoutManager.width} layoutManager itemCount: ${layoutManager.itemCount}")
+        val offset = layoutManager.width / 2 - layoutManager.width / layoutManager.itemCount / 2
 
         layoutManager.scrollToPositionWithOffset(position, offset)
-        Log.d(TAG, "position: $position offset: $offset")
 
     }
 }

@@ -3,6 +3,7 @@ package com.crystal.android.timeisgold.util
 import android.content.Context
 import android.text.format.DateFormat.getBestDateTimePattern
 import android.text.format.DateFormat.getTimeFormat
+import android.util.Log
 import com.crystal.android.timeisgold.R
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -40,7 +41,21 @@ class DateUtil {
         }
 
         fun differDates(date1: Date, date2: Date): Boolean {
-            val differ = date1.time - date2.time
+            val cal1 = Calendar.getInstance().apply {
+                this.time = date1
+                this.set(Calendar.HOUR, 0)
+                this.set(Calendar.MINUTE, 0)
+                this.set(Calendar.SECOND, 0)
+                this.set(Calendar.MILLISECOND, 0)
+            }
+            val cal2 = Calendar.getInstance().apply {
+                this.time = date2
+                this.set(Calendar.HOUR, 0)
+                this.set(Calendar.MINUTE, 0)
+                this.set(Calendar.SECOND, 0)
+                this.set(Calendar.MILLISECOND, 0)
+            }
+            val differ = cal1.time.time - cal2.time.time
             return differ == 0L
         }
 

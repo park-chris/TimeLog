@@ -7,18 +7,18 @@ import java.util.*
 
 class CalendarViewModel: ViewModel() {
 
-    private val _currentDate = MutableLiveData<Date>()
-    val currentDate: LiveData<Date> = _currentDate
+    private val _currentCalendarDate = MutableLiveData<Date>()
+    val currentCalendarDate: LiveData<Date> = _currentCalendarDate
 
-    private val _currentDay = MutableLiveData<Date>()
-    val currentDay: LiveData<Date> = _currentDay
+    private val _currentSelectDay = MutableLiveData<Date>()
+    val currentSelectDay: LiveData<Date> = _currentSelectDay
 
-    fun updateCurrentDate(date: Date) {
-        _currentDate.value = date
+    fun updateCurrentCalendar(date: Date) {
+        _currentCalendarDate.value = date
     }
 
-    fun updateCurrentDay(date: Date) {
-        _currentDay.value = date
+    fun updateCurrentSelect(date: Date) {
+        _currentSelectDay.value = date
     }
 
     companion object {

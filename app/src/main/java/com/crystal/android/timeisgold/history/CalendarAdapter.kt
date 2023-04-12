@@ -2,7 +2,6 @@ package com.crystal.android.timeisgold.history
 
 import android.content.Context
 import android.graphics.Typeface
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.crystal.android.timeisgold.R
 import com.crystal.android.timeisgold.data.CalendarData
-import com.crystal.android.timeisgold.util.DateUtil
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -53,7 +51,7 @@ class CalendarAdapter(
             dayText.text = day.toString()
 
             itemView.setOnClickListener {
-                calendarViewModel.updateCurrentDay(calData.date)
+                calendarViewModel.updateCurrentSelect(calData.date)
             }
         }
     }
