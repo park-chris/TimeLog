@@ -152,7 +152,6 @@ class RecordInfoDialogFragment : DialogFragment() {
 
     private fun setValues() {
 
-
         if (isNew) {
             updateUI()
         } else {
@@ -168,7 +167,6 @@ class RecordInfoDialogFragment : DialogFragment() {
                 }
             }
         }
-
 
 
     }

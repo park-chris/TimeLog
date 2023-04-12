@@ -10,7 +10,7 @@
         <item name="colorSecondaryVariant">@color/deep_green_blue</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
         <!-- Customize your theme here. -->
     </style>
 
@@ -18,4 +18,5 @@
         <item name="android:windowEnterAnimation">@anim/modal_slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/modal_slide_out_bottom</item>
     </style>
+
 </resources>

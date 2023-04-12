@@ -81,6 +81,7 @@ class HistoryFragment : Fragment() {
 
         calendarViewModel.currentDate.observe(viewLifecycleOwner) {
             it?.let {
+                Log.d(TAG, "date: $it")
                 currentDate = it
                 updateCalendar(currentDate)
                 updateUI(currentDate)
@@ -107,12 +108,31 @@ class HistoryFragment : Fragment() {
 
         binding.todayButton.setOnClickListener {
 /*            val today = Date()
-            calendarViewModel.updateCurrentDate(today)
+            // calendarViewModel.updateCurrentDate(today)
             calendarViewModel.updateCurrentDay(today)
             val calendar = Calendar.getInstance()
-            calendar.time = today
+            calendar.time = today*/
 
-            scrollToCenter(calendar.get(Calendar.DAY_OF_MONTH))*/
+
+            val calendar = Calendar.getInstance()
+
+            val today = calendar.get(Calendar.DAY_OF_MONTH)
+
+            calendarViewModel.updateCurrentDate(calendar.time)
+
+            val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+            val dates = mutableListOf<CalendarData>()
+
+            for (i in 1 until lastDay + 1) {
+                calendar.set(Calendar.DAY_OF_MONTH, i)
+                val cal = CalendarData(calendar.time, false)
+                dates.add(cal)
+            }
+
+            adapter!!.differ.submitList(dates)
+            calendarViewModel.updateCurrentDay(Date())
+
+            scrollToCenter(today)
         }
 
     }
@@ -162,6 +182,8 @@ class HistoryFragment : Fragment() {
 
         val calendar = Calendar.getInstance()
 
+        val today = calendar.get(Calendar.DAY_OF_MONTH)
+
         calendarViewModel.updateCurrentDate(calendar.time)
 
         val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
@@ -176,7 +198,7 @@ class HistoryFragment : Fragment() {
         adapter!!.differ.submitList(dates)
         calendarViewModel.updateCurrentDay(Date())
 
-        scrollToCenter(calendar.get(Calendar.DAY_OF_MONTH))
+        scrollToCenter(today)
 
     }
 
@@ -304,7 +326,6 @@ class HistoryFragment : Fragment() {
             }
         })
         dialog.start(getString(R.string.delete_record_title), getString(R.string.delete_record_message), getString(R.string.delete), getString(R.string.cancel), true)
-
     }
 
     private fun deleteRecord(record: Record) {
@@ -316,7 +337,11 @@ class HistoryFragment : Fragment() {
         val layoutManager = binding.calendarRecyclerView.layoutManager as? LinearLayoutManager
         layoutManager ?: return
         val offset = (binding.calendarRecyclerView.width / 2 - (layoutManager.width / layoutManager.itemCount) / 2)
+
+        Log.d(TAG, "recyclerview w: ${binding.calendarRecyclerView.width} layoutManager w: ${layoutManager.width} layoutManager itemCount: ${layoutManager.itemCount}")
+
         layoutManager.scrollToPositionWithOffset(position, offset)
+        Log.d(TAG, "position: $position offset: $offset")
 
     }
 }
