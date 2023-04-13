@@ -1,6 +1,7 @@
 package com.crystal.android.timeisgold.history
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,7 @@ class CalendarAdapter(
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         private val dayOfWeekText: TextView = itemView.findViewById(R.id.dayOfWeekText)
         private val dayText: TextView = itemView.findViewById(R.id.dayText)
+        private val checkRecordView: View = itemView.findViewById(R.id.checkRecordView)
 
         fun bind(calData: CalendarData) {
 
@@ -40,6 +42,12 @@ class CalendarAdapter(
                 dayText.setTextColor(ContextCompat.getColor(context,R.color.grey))
                 dayOfWeekText.typeface = Typeface.DEFAULT
                 dayText.typeface = Typeface.DEFAULT
+            }
+
+            if (calData.hasRecord) {
+                checkRecordView.backgroundTintList = ContextCompat.getColorStateList(context, R.color.button_color)
+            } else {
+                checkRecordView.backgroundTintList = ContextCompat.getColorStateList(context, R.color.transparent)
             }
 
             val dayOfWeek =  calendar.get(Calendar.DAY_OF_WEEK)

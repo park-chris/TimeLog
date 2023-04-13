@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +24,7 @@ import com.crystal.android.timeisgold.databinding.FragmentHistoryBinding
 import com.crystal.android.timeisgold.record.RecordViewModel
 import com.crystal.android.timeisgold.util.CustomDialog
 import com.crystal.android.timeisgold.util.DateUtil
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,6 +41,7 @@ class HistoryFragment : Fragment() {
     private var currentCalendarDate: Date = Date()
     private var currentSelectDay: Date = Date()
     private var scrollPosition = 0
+    private var calendarValidRecords = emptyList<Date>()
 
     private val calendarViewModel = CalendarViewModel.getCalendarViewModelInstance()
     private val recordViewModel by lazy {
@@ -160,17 +162,47 @@ class HistoryFragment : Fragment() {
 
         calendarViewModel.updateCurrentCalendar(calendar.time)
 
+        updateCalendarUI(calendar)
+
+
+
+    }
+
+    private fun updateCalendarUI(calendar: Calendar) {
+
         val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         val dates = mutableListOf<CalendarData>()
 
-        for (i in 1 until lastDay + 1) {
-            calendar.set(Calendar.DAY_OF_MONTH, i)
-            val cal = CalendarData(calendar.time, false)
-            dates.add(cal)
+        CoroutineScope(Dispatchers.Main).launch {
+            calendarValidRecords = getMonthRecordDates(calendar.time)
+
+            for (i in 1 until lastDay + 1) {
+                calendar.set(Calendar.DAY_OF_MONTH, i)
+                val cal = CalendarData(calendar.time, isSelected = false, hasRecord = checkHasRecord(calendar.time))
+                dates.add(cal)
+            }
+
+            adapter!!.differ.submitList(dates)
+
+            calendarViewModel.updateCurrentSelect(Date())
         }
 
-        adapter!!.differ.submitList(dates)
-        calendarViewModel.updateCurrentSelect(Date())
+    }
+
+    private fun checkHasRecord(date: Date): Boolean {
+        val filterDate = calendarValidRecords.filter { d ->
+            DateUtil.differDates(d, date)
+        }
+
+        return filterDate.isNotEmpty()
+    }
+
+
+    private suspend fun getMonthRecordDates(date: Date): List<Date> {
+        val list: List<Date> = withContext(Dispatchers.IO) {
+            recordViewModel.getCheckRecordsSum(date)
+        }
+        return list
     }
 
     private fun initRecords() {
@@ -227,7 +259,11 @@ class HistoryFragment : Fragment() {
             list.add(calData)
         }
 
+
+
         adapter!!.differ.submitList(list)
+
+        updateCalendarUI(calendar)
 
         Handler(Looper.getMainLooper()).postDelayed( { scrollToCenter(scrollPosition) }, 100)
 
@@ -244,7 +280,8 @@ class HistoryFragment : Fragment() {
         adapter ?: return
         val list = adapter!!.differ.currentList.mapIndexed { _, calData ->
             val newItem = calData.copy(
-                isSelected = DateUtil.differDates(calData.date, date)
+                isSelected = DateUtil.differDates(calData.date, date),
+                hasRecord = checkHasRecord(calData.date)
             )
             newItem
         }

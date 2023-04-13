@@ -7,9 +7,11 @@ import android.util.Log
 import com.crystal.android.timeisgold.R
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.Duration
 import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 class DateUtil {
@@ -58,6 +60,21 @@ class DateUtil {
             val differ = cal1.time.time - cal2.time.time
             return differ == 0L
         }
+
+/*        fun containDates(list: List<Date>, target: Date): Boolean {
+
+            var result = false
+
+            for (date in list) {
+                if (differDates(date, target)) {
+
+                }
+
+            }
+
+            return res
+
+        }*/
 
         fun getDayOfWeekString(context: Context, dayOfWeek: Int): String {
 

@@ -16,6 +16,7 @@
     <color name="deep_green_blue">#3B8085</color>
     <color name="green">#22695C</color>
     <color name="deep_green">#082032</color>
+    <color name="transparent">#00000000</color>
 
     <color name="basic_color">#FFFFFFFF</color>
     <color name="basic_opposite_color">#FF000000</color>

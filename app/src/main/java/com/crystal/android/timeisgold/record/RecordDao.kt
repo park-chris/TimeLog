@@ -24,6 +24,9 @@ interface RecordDao {
     @Query("SELECT * FROM record WHERE startDate BETWEEN :startMilliSec AND :endMilliSec ORDER BY startDate ASC")
     fun getSelectedRecords(startMilliSec: Long, endMilliSec: Long): LiveData<List<Record>>
 
+    @Query("SELECT startDate FROM record WHERE startDate BETWEEN :startMilliSec AND :endMilliSec ORDER BY startDate ASC")
+    fun getCheckRecordsSum(startMilliSec: Long, endMilliSec: Long): List<Date>
+
     @Update
     fun updateRecord(record: Record)
 

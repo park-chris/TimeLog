@@ -26,6 +26,8 @@ class RecordRepository private constructor(context: Context){
     fun getTime(item: String): Int = recordDao.getTime(item)
     fun getDailyTime(): LiveData<List<Record>> = recordDao.getDailyTime()
     fun getSelectedRecords(startMilli: Long, endMilli: Long): LiveData<List<Record>> = recordDao.getSelectedRecords(startMilli, endMilli)
+    fun getCheckRecordsSum(startMilli: Long, endMilli: Long): List<Date> = recordDao.getCheckRecordsSum(startMilli, endMilli)
+
 
     fun updateRecord(record: Record) {
         executor.execute {
