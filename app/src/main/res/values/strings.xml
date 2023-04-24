@@ -38,6 +38,10 @@
     <string name="write_memo">메모를 입력해주세요.</string>
     <string name="no_memo">저장된 메모가 없습니다.</string>
 
+    <!-- monitoringFragment-->
+    <string name="today_record">오늘의 기록</string>
+    <string name="item_record">항목 기록</string>
+
 
     <!-- Calendar day of week -->
     <string name="calendar_monday">Mon</string>
