@@ -23,8 +23,8 @@ class RecordRepository private constructor(context: Context){
 
     fun getRecords(): LiveData<List<Record>> = recordDao.getRecords()
     fun getRecord(id: UUID): LiveData<Record?> = recordDao.getRecord(id)
-    fun getTime(item: String): Int = recordDao.getTime(item)
-    fun getDailyTime(): LiveData<List<Record>> = recordDao.getDailyTime()
+    fun getTime(startMilli: Long, endMilli: Long, item: String): Int = recordDao.getTime(startMilli, endMilli, item)
+    fun getDailyTime(startMilli: Long, endMilli: Long): List<Record> = recordDao.getDailyTime(startMilli, endMilli)
     fun getSelectedRecords(startMilli: Long, endMilli: Long): LiveData<List<Record>> = recordDao.getSelectedRecords(startMilli, endMilli)
     fun getCheckRecordsSum(startMilli: Long, endMilli: Long): List<Date> = recordDao.getCheckRecordsSum(startMilli, endMilli)
 

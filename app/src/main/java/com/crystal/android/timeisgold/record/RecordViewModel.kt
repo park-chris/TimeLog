@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.crystal.android.timeisgold.data.Record
 import androidx.lifecycle.Transformations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -14,18 +16,18 @@ class RecordViewModel: ViewModel() {
     private val recordRepository = RecordRepository.get()
     private val recordIdLiveData = MutableLiveData<UUID>()
     private val dateLiveData = MutableLiveData<Date>()
-
     val recordListLiveData = recordRepository.getRecords()
+
 
     var recordLiveDate: LiveData<Record?> = Transformations.switchMap(recordIdLiveData) { recordId ->
         recordRepository.getRecord(recordId)
     }
 
-    val recordDailyLiveData = recordRepository.getDailyTime()
 
     var dailyTimeList: LiveData<Record?> = Transformations.switchMap(recordIdLiveData) {recordId ->
         recordRepository.getRecord(recordId)
     }
+
 
     var selectedRecordsLiveData: LiveData<List<Record>> = Transformations.switchMap(dateLiveData) {date ->
 
@@ -91,5 +93,35 @@ class RecordViewModel: ViewModel() {
         return recordRepository.getCheckRecordsSum(date1, date2)
     }
 
+
+    fun getDailyRecords(): List<Record> {
+        val cal1 = Calendar.getInstance()
+        val date1 = cal1.time.time
+        cal1.set(Calendar.HOUR, 0)
+        cal1.set(Calendar.MINUTE, 0)
+        cal1.set(Calendar.SECOND, 0)
+        cal1.add(Calendar.DATE, -7)
+        val date2 =cal1.time.time
+        return recordRepository.getDailyTime(date2, date1)
+    }
+
+    suspend fun getTime(item: String): Int {
+
+        val cal1 = Calendar.getInstance()
+        cal1.set(Calendar.HOUR, 0)
+        cal1.set(Calendar.MINUTE, 0)
+        cal1.set(Calendar.SECOND, 0)
+
+        val date1 = cal1.time.time
+        cal1.set(Calendar.HOUR, 23)
+        cal1.set(Calendar.MINUTE, 59)
+        cal1.set(Calendar.SECOND, 59)
+
+        val date2 =cal1.time.time
+
+        return withContext(Dispatchers.IO) {
+            recordRepository.getTime(date1, date2, item)
+        }
+    }
 
 }

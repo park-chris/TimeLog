@@ -15,11 +15,11 @@ interface RecordDao {
     @Query("SELECT * FROM record WHERE id=(:id)")
     fun getRecord(id: UUID): LiveData<Record?>
 
-    @Query("SELECT sum(durationTime) FROM record WHERE startDate = date('now', 'localtime') AND type=(:type)")
-    fun getTime(type: String): Int
+    @Query("SELECT sum(durationTime) FROM record WHERE startDate  BETWEEN :startMilliSec AND :endMilliSec  AND type=(:type)")
+    fun getTime(startMilliSec: Long, endMilliSec: Long, type: String): Int
 
-    @Query("SELECT * FROM record WHERE startDate BETWEEN date('now', 'start of day', '-8 days') AND date('now', 'start of day', '-1 day') ORDER BY startDate DESC")
-    fun getDailyTime(): LiveData<List<Record>>
+    @Query("SELECT * FROM record WHERE startDate BETWEEN :startMilliSec AND :endMilliSec ORDER BY startDate DESC")
+    fun getDailyTime(startMilliSec: Long, endMilliSec: Long): List<Record>
 
     @Query("SELECT * FROM record WHERE startDate BETWEEN :startMilliSec AND :endMilliSec ORDER BY startDate ASC")
     fun getSelectedRecords(startMilliSec: Long, endMilliSec: Long): LiveData<List<Record>>
