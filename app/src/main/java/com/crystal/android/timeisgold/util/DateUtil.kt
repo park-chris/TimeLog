@@ -57,24 +57,9 @@ class DateUtil {
                 this.set(Calendar.SECOND, 0)
                 this.set(Calendar.MILLISECOND, 0)
             }
-            val differ = cal1.time.time - cal2.time.time
+            val differ = (cal1.time.time - cal2.time.time) / (24 * 60 * 60 * 1000)
             return differ == 0L
         }
-
-/*        fun containDates(list: List<Date>, target: Date): Boolean {
-
-            var result = false
-
-            for (date in list) {
-                if (differDates(date, target)) {
-
-                }
-
-            }
-
-            return res
-
-        }*/
 
         fun getDayOfWeekString(context: Context, dayOfWeek: Int): String {
 

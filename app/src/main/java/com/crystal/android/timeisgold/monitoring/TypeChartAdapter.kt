@@ -85,8 +85,7 @@ class TypeChartAdapter(
 
             binding.lineChart.getTransformer(YAxis.AxisDependency.LEFT)
             binding.lineChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-
-
+            
             binding.lineChart.axisLeft.setLabelCount(7, true)
 //            y축 값
             binding.lineChart.axisLeft.axisMaximum = 24f

@@ -174,10 +174,14 @@ class HistoryFragment : Fragment() {
         val dates = mutableListOf<CalendarData>()
 
         CoroutineScope(Dispatchers.Main).launch {
+
             calendarValidRecords = getMonthRecordDates(calendar.time)
+
+            Log.d(TAG, "record: $calendarValidRecords")
 
             for (i in 1 until lastDay + 1) {
                 calendar.set(Calendar.DAY_OF_MONTH, i)
+                Log.d(TAG, "index: $i")
                 val cal = CalendarData(calendar.time, isSelected = false, hasRecord = checkHasRecord(calendar.time))
                 dates.add(cal)
             }
@@ -185,6 +189,7 @@ class HistoryFragment : Fragment() {
             adapter!!.differ.submitList(dates)
 
             calendarViewModel.updateCurrentSelect(Date())
+
         }
 
     }
@@ -197,12 +202,8 @@ class HistoryFragment : Fragment() {
         return filterDate.isNotEmpty()
     }
 
-
-    private suspend fun getMonthRecordDates(date: Date): List<Date> {
-        val list: List<Date> = withContext(Dispatchers.IO) {
-            recordViewModel.getCheckRecordsSum(date)
-        }
-        return list
+    private suspend fun getMonthRecordDates(date: Date) = withContext(Dispatchers.IO) {
+        recordViewModel.getCheckRecordsSum(date)
     }
 
     private fun initRecords() {
