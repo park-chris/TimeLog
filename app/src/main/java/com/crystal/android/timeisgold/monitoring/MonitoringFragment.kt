@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat.animate
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.crystal.android.timeisgold.R
 import com.crystal.android.timeisgold.data.CalendarData
 import com.crystal.android.timeisgold.data.Record
@@ -31,6 +32,7 @@ class MonitoringFragment : Fragment() {
 
     private var _binding: FragmentMonitoringBinding? = null
     private val binding get() = _binding!!
+    private lateinit var adapter: TypeChartAdapter
 
     private val recordViewModel: RecordViewModel by lazy {
         ViewModelProvider(this).get(RecordViewModel::class.java)
@@ -50,7 +52,6 @@ class MonitoringFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setValues()
-        setupEvents()
     }
 
     override fun onDestroyView() {
@@ -60,25 +61,23 @@ class MonitoringFragment : Fragment() {
 
     private fun setValues() {
 
-        var itemList = ContextUtil.getTypeListPref(requireContext())
+        val typeList = ContextUtil.getTypeListPref(requireContext())
         var records = emptyList<Record>()
 
         setPieChart()
+        initRecyclerView()
 
         CoroutineScope(Dispatchers.Main).launch {
 
-
             records = getDailyRecords()
 
-
-            Log.d(TAG, "records: $records")
-
+            updateTypeChart(typeList, records)
         }
-
     }
 
-    private fun setupEvents() {
-
+    private fun updateTypeChart(typeList: List<String>, records: List<Record>) {
+        adapter = TypeChartAdapter(requireContext(), typeList, records)
+        binding.typeChartRecyclerView.adapter = adapter
     }
 
     private suspend fun getDailyRecords(): List<Record> {
@@ -88,13 +87,11 @@ class MonitoringFragment : Fragment() {
         return list
     }
 
-//    private fun initRecyclerView() {
-//        binding.itemRecyclerView.apply {
-//            layoutManager =
-//                adapter =
-//
-//        }
-//    }
+    private fun initRecyclerView() {
+        binding.typeChartRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        }
+    }
 
     private fun setPieChart() {
         val itemList = ContextUtil.getTypeListPref(requireContext())
@@ -121,19 +118,23 @@ class MonitoringFragment : Fragment() {
                     }
                 }
             }
-            val colorsItems = ArrayList<Int>()
 
-            for (c in ColorTemplate.PASTEL_COLORS) colorsItems.add(c)
-            for (c in ColorTemplate.VORDIPLOM_COLORS) colorsItems.add(c)
-            for (c in ColorTemplate.JOYFUL_COLORS) colorsItems.add(c)
+            val colorsItems = arrayListOf<Int>(
+                Color.parseColor("#22695C"),
+                Color.parseColor("#0b986a"),
+                Color.parseColor("#4dc493"),
+                Color.parseColor("#82dcb9"),
+            )
             for (c in ColorTemplate.LIBERTY_COLORS) colorsItems.add(c)
-            colorsItems.add(ColorTemplate.getHoloBlue())
+            for (c in ColorTemplate.JOYFUL_COLORS) colorsItems.add(c)
+            for (c in ColorTemplate.VORDIPLOM_COLORS) colorsItems.add(c)
+            for (c in ColorTemplate.PASTEL_COLORS) colorsItems.add(c)
 
             val pieDataSet = PieDataSet(entries, "")
             pieDataSet.apply {
                 colors = colorsItems
-                valueTextColor = Color.BLACK
-                valueTextSize = 16f
+                valueTextColor = R.color.basic_opposite_color
+                valueTextSize = 18f
                 xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
                 valueLinePart1OffsetPercentage = 70f
                 valueLinePart1Length = 0.4f
@@ -152,7 +153,7 @@ class MonitoringFragment : Fragment() {
 //            그래프 한 가운데에 들어갈 텍스트
                 centerText = "Today"
 //            그래프 아이템의 이름의 색을 지정 (디폴트: 흰색)
-                setEntryLabelColor(Color.BLACK)
+                setEntryLabelColor(R.color.basic_opposite_color)
 //            최초 그래프가 실행 시 동작하는 애니메이션, 12시를 시작으로 한바귀 돔
                 animateY(1400, Easing.EaseInOutQuad)
                 animate()

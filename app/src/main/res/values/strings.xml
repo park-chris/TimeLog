@@ -42,6 +42,7 @@
     <string name="today_record">오늘의 기록</string>
     <string name="item_record">항목 기록</string>
     <string name="no_time">없음</string>
+    <string name="month_day">월/일</string>
 
     <!-- Calendar day of week -->
     <string name="calendar_monday">Mon</string>
