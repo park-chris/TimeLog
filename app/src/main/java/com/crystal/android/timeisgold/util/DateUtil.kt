@@ -45,14 +45,14 @@ class DateUtil {
         fun differDates(date1: Date, date2: Date): Boolean {
             val cal1 = Calendar.getInstance().apply {
                 this.time = date1
-                this.set(Calendar.HOUR, 0)
+                this.set(Calendar.HOUR_OF_DAY, 0)
                 this.set(Calendar.MINUTE, 0)
                 this.set(Calendar.SECOND, 0)
                 this.set(Calendar.MILLISECOND, 0)
             }
             val cal2 = Calendar.getInstance().apply {
                 this.time = date2
-                this.set(Calendar.HOUR, 0)
+                this.set(Calendar.HOUR_OF_DAY, 0)
                 this.set(Calendar.MINUTE, 0)
                 this.set(Calendar.SECOND, 0)
                 this.set(Calendar.MILLISECOND, 0)

@@ -34,14 +34,17 @@ class RecordViewModel: ViewModel() {
         val cal1 = Calendar.getInstance()
         cal1.time = date
 
-        cal1.set(Calendar.HOUR, 0)
+        cal1.set(Calendar.HOUR_OF_DAY, 0)
         cal1.set(Calendar.MINUTE, 0)
         cal1.set(Calendar.SECOND, 0)
-        cal1.set(Calendar.MILLISECOND, 0)
 
         val date1 = cal1.time.time
 
-        cal1.set(Calendar.HOUR, 23)
+
+        val cal2 = Calendar.getInstance()
+        cal2.time = Date(1683734083858)
+
+        cal1.set(Calendar.HOUR_OF_DAY, 23)
         cal1.set(Calendar.MINUTE, 59)
         cal1.set(Calendar.SECOND, 59)
 
@@ -75,7 +78,7 @@ class RecordViewModel: ViewModel() {
         val cal1 = Calendar.getInstance()
         cal1.time = date
 
-        cal1.set(Calendar.HOUR, 0)
+        cal1.set(Calendar.HOUR_OF_DAY, 0)
         cal1.set(Calendar.MINUTE, 0)
         cal1.set(Calendar.SECOND, 0)
         cal1.set(Calendar.MILLISECOND, 0)
@@ -83,7 +86,7 @@ class RecordViewModel: ViewModel() {
 
         val date1 = cal1.time.time
 
-        cal1.set(Calendar.HOUR, 23)
+        cal1.set(Calendar.HOUR_OF_DAY, 23)
         cal1.set(Calendar.MINUTE, 59)
         cal1.set(Calendar.SECOND, 59)
         cal1.set(Calendar.DAY_OF_MONTH, cal1.getActualMaximum(Calendar.DAY_OF_MONTH))
@@ -97,7 +100,7 @@ class RecordViewModel: ViewModel() {
     fun getDailyRecords(): List<Record> {
         val cal1 = Calendar.getInstance()
         val date1 = cal1.time.time
-        cal1.set(Calendar.HOUR, 0)
+        cal1.set(Calendar.HOUR_OF_DAY, 0)
         cal1.set(Calendar.MINUTE, 0)
         cal1.set(Calendar.SECOND, 0)
         cal1.add(Calendar.DATE, -7)
@@ -108,12 +111,12 @@ class RecordViewModel: ViewModel() {
     suspend fun getTime(item: String): Int {
 
         val cal1 = Calendar.getInstance()
-        cal1.set(Calendar.HOUR, 0)
+        cal1.set(Calendar.HOUR_OF_DAY, 0)
         cal1.set(Calendar.MINUTE, 0)
         cal1.set(Calendar.SECOND, 0)
 
         val date1 = cal1.time.time
-        cal1.set(Calendar.HOUR, 23)
+        cal1.set(Calendar.HOUR_OF_DAY, 23)
         cal1.set(Calendar.MINUTE, 59)
         cal1.set(Calendar.SECOND, 59)
 

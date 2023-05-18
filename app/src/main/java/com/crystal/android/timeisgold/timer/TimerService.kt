@@ -156,7 +156,7 @@ class TimerService : Service() {
 
 
         notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID_TIMER)
-            .setSmallIcon(R.drawable.ic_app_logo_foreground)
+            .setSmallIcon(R.mipmap.ic_app_logo_round)
             .setContentTitle(getString(R.string.timer_notification_title))
             .setContentText(UIUtil.getDurationTime(second))
             .setAutoCancel(true)

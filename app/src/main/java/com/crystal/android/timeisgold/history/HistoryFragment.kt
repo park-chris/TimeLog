@@ -299,7 +299,7 @@ class HistoryFragment : Fragment() {
 
     private fun showBottomDialog(record: Record) {
 
-        val dialog: Dialog = Dialog(requireActivity())
+        val dialog = Dialog(requireActivity())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.bottomsheet_record_menu)
 

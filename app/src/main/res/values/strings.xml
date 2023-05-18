@@ -53,4 +53,23 @@
     <string name="calendar_saturday">Sat</string>
     <string name="calendar_sunday">Sun</string>
 
+    <!-- SettingsFragment -->
+    <string name="app_settings">앱 설정</string>
+    <string name="language">언어</string>
+    <string name="theme">테마</string>
+    <string name="item_settings">항목 설정</string>
+    <string name="light_theme">Light</string>
+    <string name="dark_theme">Dark</string>
+
+    <string name="app_information">앱 정보</string>
+    <string name="app_version">현재 앱 버전</string>
+
+    <string name="ask">문의하기</string>
+
+
+
+
+    <string name="email_email">gndld4342@gmail.com</string>
+    <string name="email_title">[시간 기록자] 문의</string>
+    <string name="email_content">문의 내용을 입력해주세요.</string>
 </resources>
