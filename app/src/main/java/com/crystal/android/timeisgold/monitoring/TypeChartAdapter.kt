@@ -28,8 +28,6 @@ class TypeChartAdapter(
 
     inner class ViewHolder(val binding: TypeChartListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
-        private lateinit var type: String
-
         fun bind(type: String) {
 
             binding.typeTextView.text = type
@@ -75,7 +73,7 @@ class TypeChartAdapter(
 
             dataSet.valueFormatter = MyValueFormatter()
             dataSet.setDrawFilled(true)
-            dataSet.fillDrawable = ContextCompat.getDrawable(context, R.drawable.background_circle)
+            dataSet.fillColor = ContextCompat.getColor(context, R.color.green)
             dataSet.setCircleColor(ContextCompat.getColor(context, R.color.green))
             dataSet.color = ContextCompat.getColor(context, R.color.green)
 
@@ -95,7 +93,6 @@ class TypeChartAdapter(
             binding.lineChart.axisRight.setDrawLabels(false)
             binding.lineChart.axisRight.setDrawAxisLine(false)
             binding.lineChart.axisRight.setDrawGridLines(false)
-//            binding.lineChart.description.text = context.getString(R.string.latest_date)
             binding.lineChart.description.text = context.getString(R
                 .string.month_day)
             binding.lineChart.description.textColor = Color.GRAY

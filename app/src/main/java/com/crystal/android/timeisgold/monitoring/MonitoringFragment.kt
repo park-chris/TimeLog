@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.view.ViewCompat.animate
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -133,9 +134,10 @@ class MonitoringFragment : Fragment() {
             val pieDataSet = PieDataSet(entries, "")
             pieDataSet.apply {
                 colors = colorsItems
-                valueTextColor = R.color.basic_opposite_color
-                valueTextSize = 18f
+                valueTextSize = 14f
+                valueTextColor = getColor(R.color.grey)
                 xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+                valueLineColor = getColor(R.color.grey)
                 valueLinePart1OffsetPercentage = 70f
                 valueLinePart1Length = 0.4f
                 valueLinePart2Length = 0.2f
@@ -146,15 +148,10 @@ class MonitoringFragment : Fragment() {
             val pieData = PieData(pieDataSet)
             binding.pieChart.apply {
                 data = pieData
-//            description : 해당 그래프 오른쪽 아래 그래프의 이름을 표시
                 description.isEnabled = false
-//            isRotationEnable : 그래프의 회전 애니메이션으로 드래그를 통해 그래프를 회전판처럼 돌리는게 가능
                 isRotationEnabled = false
-//            그래프 한 가운데에 들어갈 텍스트
                 centerText = "Today"
-//            그래프 아이템의 이름의 색을 지정 (디폴트: 흰색)
-                setEntryLabelColor(R.color.basic_opposite_color)
-//            최초 그래프가 실행 시 동작하는 애니메이션, 12시를 시작으로 한바귀 돔
+                setEntryLabelColor(getColor(context, R.color.grey))
                 animateY(1400, Easing.EaseInOutQuad)
                 animate()
             }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TimeIsGold</string>
+    <string name="app_name">타임로그</string>
     <string name="timer">타이머</string>
     <string name="history">기록</string>
     <string name="monitoring">모니터링</string>
@@ -42,7 +42,7 @@
     <string name="today_record">오늘의 기록</string>
     <string name="item_record">항목 기록</string>
     <string name="no_time">없음</string>
-    <string name="month_day">월/일</string>
+    <string name="month_day">시간/날짜</string>
 
     <!-- Calendar day of week -->
     <string name="calendar_monday">Mon</string>

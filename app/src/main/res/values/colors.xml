@@ -19,7 +19,7 @@
     <color name="transparent">#00000000</color>
 
     <color name="basic_color">#FFFFFFFF</color>
-    <color name="basic_opposite_color">#FF000000</color>
+    <color name="basic_opposite_color">#000000</color>
 
     <color name="container_color">#F8F8F8</color>
 
