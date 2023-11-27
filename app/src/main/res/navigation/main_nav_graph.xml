@@ -8,28 +8,28 @@
 
     <keep_state_fragment
         android:id="@+id/timer_fragment"
-        android:name="com.crystal.android.timeisgold.timer.TimerFragment"
+        android:name="com.crystal.timeisgold.timer.TimerFragment"
         app:popUpToSaveState="true"
         tools:layout="@layout/fragment_timer"
         android:label="TimerFragment" />
 
     <keep_state_fragment
         android:id="@+id/monitoring_fragment"
-        android:name="com.crystal.android.timeisgold.monitoring.MonitoringFragment"
+        android:name="com.crystal.timeisgold.monitoring.MonitoringFragment"
         app:popUpToSaveState="true"
         tools:layout="@layout/fragment_monitoring"
         android:label="MonitoringFragment" />
 
     <keep_state_fragment
         android:id="@+id/history_fragment"
-        android:name="com.crystal.android.timeisgold.history.HistoryFragment"
+        android:name="com.crystal.timeisgold.history.HistoryFragment"
         app:popUpToSaveState="true"
         tools:layout="@layout/fragment_history"
         android:label="HistoryFragment" />
 
     <keep_state_fragment
         android:id="@+id/settings_fragment"
-        android:name="com.crystal.android.timeisgold.settings.SettingsFragment"
+        android:name="com.crystal.timeisgold.settings.SettingsFragment"
         app:popUpToSaveState="true"
         tools:layout="@layout/fragment_settings"
         android:label="SettingsFragment" />
