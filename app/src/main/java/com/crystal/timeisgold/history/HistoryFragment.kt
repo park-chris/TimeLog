@@ -47,10 +47,6 @@ class HistoryFragment : Fragment() {
         ViewModelProvider(requireActivity()).get(RecordViewModel::class.java)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -96,8 +92,11 @@ class HistoryFragment : Fragment() {
         }
 
         recordViewModel.selectedRecordsLiveData.observe(viewLifecycleOwner) {
-            it?.let {
-                updateRecord(it)
+            updateRecord(it)
+            if (it.isEmpty()) {
+                binding.infoTextView.visibility = View.VISIBLE
+            } else {
+                binding.infoTextView.visibility = View.GONE
             }
         }
     }

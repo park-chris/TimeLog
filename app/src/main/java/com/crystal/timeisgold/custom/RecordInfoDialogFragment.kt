@@ -42,7 +42,7 @@ class RecordInfoDialogFragment : DialogFragment() {
     private var typeIsSelected = false
 
     private val recordViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(RecordViewModel::class.java)
+        ViewModelProvider(requireActivity())[RecordViewModel::class.java]
     }
 
     override fun onCancel(dialog: DialogInterface) {
@@ -241,14 +241,6 @@ class RecordInfoDialogFragment : DialogFragment() {
         binding.durationText.text = UIUtil.getDurationTime(duration)
         binding.startDateText.text = DateUtil.dateToString(startDate)
         binding.endDateText.text = DateUtil.dateToString(endDate)
-
-        val breakTime = ((endDate.time - startDate.time) / 1000) - duration
-
-        if (breakTime > 0) {
-            binding.breakText.text = UIUtil.getDurationTime(breakTime)
-        } else {
-            binding.breakText.text = getString(R.string.timer_notification_content, 0, 0, 0)
-        }
 
         if (memo.isNotEmpty()) {
             binding.memoEditText.setText(memo)
