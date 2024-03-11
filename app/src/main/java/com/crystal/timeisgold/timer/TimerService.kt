@@ -51,18 +51,23 @@ class TimerService : Service() {
                 ACTION_CLOSE -> {
                     close()
                 }
+
                 ACTION_RESET -> {
                     reset()
                 }
+
                 ACTION_PAUSE -> {
                     pause()
                 }
+
                 ACTION_START -> {
                     startTimer()
                 }
+
                 ACTION_MOVE_TO_BACKGROUND -> {
                     moveToBackground()
                 }
+
                 ACTION_MOVE_TO_FOREGROUND -> {
                     moveToForeground()
                 }
@@ -90,9 +95,9 @@ class TimerService : Service() {
         super.onDestroy()
         timer?.cancel()
         notificationManager?.cancel(NOTIFICATION_ID_TIMER)
- /*       val intent = Intent(ACTION_CLOSE)
-        intent.putExtra(TIMER_VALUE, second)
-        sendBroadcast(intent)*/
+        /*       val intent = Intent(ACTION_CLOSE)
+               intent.putExtra(TIMER_VALUE, second)
+               sendBroadcast(intent)*/
         applicationContext.unregisterReceiver(receiver)
         stopSelf()
     }
@@ -132,21 +137,20 @@ class TimerService : Service() {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
-        val pendingIntent: PendingIntent
 
-/*
-        val closePendingIntent: PendingIntent
+
         val closeIntent = Intent(ACTION_CLOSE).apply {
             action = ACTION_CLOSE
         }
-*/
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            pendingIntent = PendingIntent.getActivity(this, 0, intent, 0 or PendingIntent.FLAG_MUTABLE)
-           // closePendingIntent = PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE)
+        val closePendingIntent =
+            PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_MUTABLE)
+
+
+        val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.getActivity(this, 0, intent, 0 or PendingIntent.FLAG_MUTABLE)
         } else {
-            pendingIntent = PendingIntent.getActivity(this, 0, intent, 0 or PendingIntent.FLAG_MUTABLE)
-            //closePendingIntent = PendingIntent.getBroadcast(this, 1, closeIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+            PendingIntent.getActivity(this, 0, intent, 0 or PendingIntent.FLAG_MUTABLE)
         }
 
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -160,7 +164,7 @@ class TimerService : Service() {
             .setSound(defaultSoundUri)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
-            //.addAction(R.drawable.ic_close, getString(R.string.finish), closePendingIntent)
+            .addAction(R.drawable.ic_close, getString(R.string.finish), closePendingIntent)
 
         return notificationBuilder!!.build()
     }
@@ -237,7 +241,7 @@ class TimerService : Service() {
                 buildNotification()
             )
         } else {
-           reset()
+            reset()
         }
     }
 
