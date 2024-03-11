@@ -99,8 +99,6 @@ class RecordInfoDialogFragment : DialogFragment() {
 
         isNew = arguments?.getBoolean(NEW_RECORD) ?: false
 
-        Log.d("testLog", "usNew: $isNew")
-
         if (isNew) {
             duration = arguments?.getLong(RECORD_DURATION) ?: 0
             val argsStartDate = arguments?.getLong(RECORD_START_DATE) ?: 0

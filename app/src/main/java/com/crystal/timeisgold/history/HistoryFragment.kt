@@ -176,11 +176,8 @@ class HistoryFragment : Fragment() {
 
             calendarValidRecords = getMonthRecordDates(calendar.time)
 
-            Log.d(TAG, "record: $calendarValidRecords")
-
             for (i in 1 until lastDay + 1) {
                 calendar.set(Calendar.DAY_OF_MONTH, i)
-                Log.d(TAG, "index: $i")
                 val cal = CalendarData(calendar.time, isSelected = false, hasRecord = checkHasRecord(calendar.time))
                 dates.add(cal)
             }
