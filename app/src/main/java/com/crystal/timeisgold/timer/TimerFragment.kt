@@ -16,8 +16,6 @@ import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -27,12 +25,8 @@ import com.crystal.timeisgold.databinding.FragmentTimerBinding
 import com.crystal.timeisgold.util.CustomDialog
 import com.crystal.timeisgold.util.ServiceUtil
 import com.crystal.timeisgold.util.UIUtil
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.NonCancellable.start
+import com.google.android.gms.ads.AdRequest
 import java.util.*
-
-private const val TAG = "TimerFragment"
-
 
 class TimerFragment : Fragment() {
 
@@ -99,6 +93,8 @@ class TimerFragment : Fragment() {
             timerAnimation.cancel()
             isPlaying = false
         }
+
+        loadBanner()
 
         return binding.root
     }
@@ -266,6 +262,11 @@ class TimerFragment : Fragment() {
         binding.operatorButton.setImageResource(R.drawable.ic_play)
 
         isPlaying = false
+    }
+
+    private fun loadBanner() {
+        val adRequest = AdRequest.Builder().build()
+        binding.adViewContainer.loadAd(adRequest)
     }
 
     private fun showResetDialog() {
