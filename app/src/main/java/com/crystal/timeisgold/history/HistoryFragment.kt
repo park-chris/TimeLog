@@ -110,6 +110,14 @@ class HistoryFragment : Fragment() {
             calendarViewModel.updateCurrentCalendar(calendar.time)
         }
 
+        binding.prevButton.setOnClickListener {
+            updateDate(currentCalendarDate, previous = true, next = false)
+        }
+
+        binding.nextButton.setOnClickListener {
+            updateDate(currentCalendarDate, previous = false, next = true)
+        }
+
     }
 
     private fun initCalendar() {
