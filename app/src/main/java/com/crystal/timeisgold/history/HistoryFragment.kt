@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.crystal.timeisgold.R
+import com.crystal.timeisgold.custom.DialogType
 import com.crystal.timeisgold.custom.RecordInfoDialogFragment
 import com.crystal.timeisgold.data.CalendarData
 import com.crystal.timeisgold.data.Record
@@ -217,7 +218,7 @@ class HistoryFragment : Fragment() {
             }
 
             override fun onClickItem(id: UUID) {
-                val dialog = RecordInfoDialogFragment.newInstance(id)
+                val dialog = RecordInfoDialogFragment.newInstance(id, DialogType.Edit)
                 dialog.show(requireActivity().supportFragmentManager, "RecordInfoDialogFragment")
             }
         })

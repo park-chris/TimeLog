@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.crystal.timeisgold.R
@@ -24,11 +25,16 @@ import com.crystal.timeisgold.util.DateUtil
 import com.crystal.timeisgold.util.UIUtil
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.internal.ViewUtils.hideKeyboard
 import java.util.*
 import kotlin.collections.ArrayList
 
-
-class RecordInfoDialogFragment : DialogFragment() {
+enum class DialogType {
+    New, Edit
+}
+class RecordInfoDialogFragment(
+    private val type: DialogType = DialogType.New
+) : DialogFragment() {
 
     private var _binding: DialogRecordInfoFragmentBinding? = null
     private val binding get() = _binding!!
@@ -40,6 +46,7 @@ class RecordInfoDialogFragment : DialogFragment() {
     private var isNew = false
     private var typeList: ArrayList<String> = arrayListOf()
     private var typeIsSelected = false
+    private var isEdit = true
 
     private val recordViewModel by lazy {
         ViewModelProvider(requireActivity())[RecordViewModel::class.java]
@@ -47,10 +54,6 @@ class RecordInfoDialogFragment : DialogFragment() {
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
     }
 
     companion object {
@@ -79,8 +82,8 @@ class RecordInfoDialogFragment : DialogFragment() {
             return fragment
         }
 
-        fun newInstance(recordUid: UUID): DialogFragment {
-            val fragment = RecordInfoDialogFragment()
+        fun newInstance(recordUid: UUID, type: DialogType): DialogFragment {
+            val fragment = RecordInfoDialogFragment(type)
             val args = Bundle()
             args.putString(RECORD_UID, recordUid.toString())
             args.putBoolean(NEW_RECORD, false)
@@ -132,6 +135,10 @@ class RecordInfoDialogFragment : DialogFragment() {
 
         val view = binding.root
 
+        binding.type = type
+        if (type == DialogType.Edit)  isEdit = false
+        binding.isEdit = isEdit
+
         dialog?.window?.setBackgroundDrawableResource(R.color.dialog_background)
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
@@ -170,20 +177,13 @@ class RecordInfoDialogFragment : DialogFragment() {
     private fun setupEvents() {
 
         // 저장 버튼
-        binding.saveButton.setOnClickListener {
-            saveRecord()
-        }
-
-        binding.backButton.setOnClickListener {
-            showDialog()
-        }
-
-        binding.layout.setOnClickListener {
-            hideKeyboard()
-        }
-
-        binding.typeButton.setOnClickListener {
-            showModalBottomSheet()
+        binding.saveButton.setOnClickListener {saveRecord() }
+        binding.backButton.setOnClickListener {showDialog()}
+        binding.layout.setOnClickListener {hideKeyboard() }
+        binding.typeButton.setOnClickListener {showModalBottomSheet()}
+        binding.editButton.setOnClickListener {
+            isEdit = !isEdit
+            binding.isEdit = isEdit
         }
 
     }
