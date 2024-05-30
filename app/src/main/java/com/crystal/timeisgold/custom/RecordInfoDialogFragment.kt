@@ -6,6 +6,8 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -47,6 +49,7 @@ class RecordInfoDialogFragment(
     private var typeList: ArrayList<String> = arrayListOf()
     private var typeIsSelected = false
     private var isEdit = true
+    private var modified = false
 
     private val recordViewModel by lazy {
         ViewModelProvider(requireActivity())[RecordViewModel::class.java]
@@ -93,6 +96,11 @@ class RecordInfoDialogFragment(
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        modified = false
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -189,7 +197,6 @@ class RecordInfoDialogFragment(
     }
 
     private fun saveRecord() {
-        /*  새로 record 생성*/
         val record = Record()
 
         memo = binding.memoEditText.text.toString()
@@ -212,28 +219,34 @@ class RecordInfoDialogFragment(
             recordViewModel.updateRecord(record)
         } else {
             recordViewModel.addRecord(record)
+            dismiss()
         }
 
-        dismiss()
+        Toast.makeText(requireContext(), getString(R.string.save_memo), Toast.LENGTH_SHORT).show()
     }
 
     private fun showDialog() {
-        val dialog = CustomDialog(requireContext())
-        dialog.setOnClickListener(object : CustomDialog.OnClickEventListener {
-            override fun onPositiveClick() {
-                dismiss()
-            }
 
-            override fun onNegativeClick() {
-            }
-        })
-        dialog.start(
-            getString(R.string.back_title),
-            getString(R.string.back_message),
-            getString(R.string.ok),
-            getString(R.string.cancel),
-            true
-        )
+        if (memo != binding.memoEditText.text.toString()) {
+            val dialog = CustomDialog(requireContext())
+            dialog.setOnClickListener(object : CustomDialog.OnClickEventListener {
+                override fun onPositiveClick() {
+                    dismiss()
+                }
+
+                override fun onNegativeClick() {
+                }
+            })
+            dialog.start(
+                getString(R.string.back_title),
+                getString(R.string.back_message),
+                getString(R.string.ok),
+                getString(R.string.cancel),
+                true
+            )
+        } else {
+            dismiss()
+        }
     }
 
     private fun updateUI() {
@@ -246,7 +259,6 @@ class RecordInfoDialogFragment(
             binding.memoEditText.setText(memo)
         }
     }
-
     private fun hideKeyboard() {
         val imm: InputMethodManager =
             requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
