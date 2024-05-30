@@ -1,5 +1,6 @@
 package com.crystal.timeisgold.history
 
+import android.app.DatePickerDialog
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -8,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
+import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -119,7 +121,42 @@ class HistoryFragment : Fragment() {
             updateDate(currentCalendarDate, previous = false, next = true)
         }
 
+        binding.yearMonthLayout.setOnClickListener {
+            showDatePicker { date ->
+                calendarViewModel.updateCurrentSelect(date)
+                calendarViewModel.updateCurrentCalendar(date)
+                recordViewModel.loadRecords(date)
+            }
+        }
+
     }
+    private fun showDatePicker(onDateSelected: (date: Date) -> Unit) {
+        val calendar = Calendar.getInstance().apply {
+            time = currentSelectDay
+        }
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        Log.e("TestLog", "currentSelectDay $currentSelectDay \ncurrentCalendarDate  $currentCalendarDate" )
+
+        val datePickerDialog = DatePickerDialog(
+            requireContext(),
+            { _, selectedYear, selectedMonth, selectedDay ->
+                val selectedCalendar = Calendar.getInstance().apply {
+                    set(Calendar.YEAR, selectedYear)
+                    set(Calendar.MONTH, selectedMonth)
+                    set(Calendar.DAY_OF_MONTH, selectedDay)
+                }
+                onDateSelected(selectedCalendar.time)
+            },
+            year,
+            month,
+            day
+        )
+        datePickerDialog.show()
+    }
+
 
     private fun initCalendar() {
 
