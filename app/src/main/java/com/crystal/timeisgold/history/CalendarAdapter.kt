@@ -16,11 +16,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CalendarAdapter(
-    private val context: Context
+    private val context: Context,
+    private val onClick: (date: Date) -> Unit
 ): RecyclerView.Adapter<CalendarAdapter.ViewHolder>() {
-
-    private val calendarViewModel = CalendarViewModel.getCalendarViewModelInstance()
-
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         private val dayOfWeekText: TextView = itemView.findViewById(R.id.dayOfWeekText)
         private val dayText: TextView = itemView.findViewById(R.id.dayText)
@@ -49,7 +47,6 @@ class CalendarAdapter(
                 checkRecordView.backgroundTintList = ContextCompat.getColorStateList(context, R.color.transparent)
             }
 
-            val dayOfWeek =  calendar.get(Calendar.DAY_OF_WEEK)
             val day = calendar.get(Calendar.DATE)
 
             val dayOfWeekFormat = SimpleDateFormat("EE", Locale.getDefault())
@@ -58,7 +55,7 @@ class CalendarAdapter(
             dayText.text = day.toString()
 
             itemView.setOnClickListener {
-                calendarViewModel.updateCurrentSelect(calData.date)
+                onClick(calData.date)
             }
         }
     }

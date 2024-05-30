@@ -9,7 +9,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -40,10 +39,15 @@ class HistoryFragment : Fragment() {
     private lateinit var recordAdapter: RecordAdapter
     private var startLastClickedTime: Long = 0L
     private var endLastClickedTime: Long = 0L
-    private var currentCalendarDate: Date = Date()
-    private var currentSelectDay: Date = Date()
+//    private var currentCalendarDate: Date = Date()
+//    private var currentSelectDay: Date = Date()
     private var scrollPosition = 0
-    private var calendarValidRecords = emptyList<Date>()
+//    private var calendarValidRecords = emptyList<Date>()
+
+    private var calendarDate: Date = Date()
+    private var selectedDate: Date = Date()
+    private var recordDates = emptyList<Date>()
+
 
     private val calendarViewModel = CalendarViewModel.getCalendarViewModelInstance()
     private val recordViewModel by lazy {
@@ -80,21 +84,21 @@ class HistoryFragment : Fragment() {
 
         calendarViewModel.currentCalendarDate.observe(viewLifecycleOwner) {
             it?.let {
-                currentCalendarDate = it
-                updateCalendar(currentCalendarDate)
-                updateUI(currentCalendarDate)
+                calendarDate = it
+                updateCalendar(it)
             }
         }
 
         calendarViewModel.currentSelectDay.observe(viewLifecycleOwner) {
             it?.let {
-                currentSelectDay = it
+                selectedDate = it
                 updateSelectedCalendar(it)
                 recordViewModel.loadRecords(it)
             }
         }
 
         recordViewModel.selectedRecordsLiveData.observe(viewLifecycleOwner) {
+            Log.e("TestLog", "list $it")
             updateRecord(it)
             if (it.isEmpty()) {
                 binding.infoTextView.visibility = View.VISIBLE
@@ -114,11 +118,11 @@ class HistoryFragment : Fragment() {
         }
 
         binding.prevButton.setOnClickListener {
-            updateDate(currentCalendarDate, previous = true, next = false)
+            updateDate(calendarDate, previous = true, next = false)
         }
 
         binding.nextButton.setOnClickListener {
-            updateDate(currentCalendarDate, previous = false, next = true)
+            updateDate(calendarDate, previous = false, next = true)
         }
 
         binding.yearMonthLayout.setOnClickListener {
@@ -132,13 +136,11 @@ class HistoryFragment : Fragment() {
     }
     private fun showDatePicker(onDateSelected: (date: Date) -> Unit) {
         val calendar = Calendar.getInstance().apply {
-            time = currentSelectDay
+            time = selectedDate
         }
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        Log.e("TestLog", "currentSelectDay $currentSelectDay \ncurrentCalendarDate  $currentCalendarDate" )
 
         val datePickerDialog = DatePickerDialog(
             requireContext(),
@@ -160,7 +162,9 @@ class HistoryFragment : Fragment() {
 
     private fun initCalendar() {
 
-        adapter = CalendarAdapter(requireContext())
+        adapter = CalendarAdapter(requireContext()) {date ->
+            calendarViewModel.updateCurrentSelect(date)
+        }
         val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         binding.calendarRecyclerView.layoutManager = layoutManager
         binding.calendarRecyclerView.adapter = adapter
@@ -179,7 +183,7 @@ class HistoryFragment : Fragment() {
                     val interval = System.currentTimeMillis() - startLastClickedTime
 
                     if (interval < 1000) {
-                        updateDate(currentCalendarDate, previous = true, next = false)
+                        updateDate(calendarDate, previous = true, next = false)
                     }
 
                     startLastClickedTime = System.currentTimeMillis()
@@ -189,7 +193,7 @@ class HistoryFragment : Fragment() {
 
                     val interval = System.currentTimeMillis() - endLastClickedTime
                     if (interval < 1000) {
-                        updateDate(currentCalendarDate, previous = false, next = true)
+                        updateDate(calendarDate, previous = false, next = true)
                     }
 
                     endLastClickedTime = System.currentTimeMillis()
@@ -203,40 +207,11 @@ class HistoryFragment : Fragment() {
         val calendar = Calendar.getInstance()
 
         scrollPosition = calendar.get(Calendar.DAY_OF_MONTH)
-
         calendarViewModel.updateCurrentCalendar(calendar.time)
-
-        updateCalendarUI(calendar)
-
-
-
-    }
-
-    private fun updateCalendarUI(calendar: Calendar) {
-
-        val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val dates = mutableListOf<CalendarData>()
-
-        CoroutineScope(Dispatchers.Main).launch {
-
-            calendarValidRecords = getMonthRecordDates(calendar.time)
-
-            for (i in 1 until lastDay + 1) {
-                calendar.set(Calendar.DAY_OF_MONTH, i)
-                val cal = CalendarData(calendar.time, isSelected = false, hasRecord = checkHasRecord(calendar.time))
-                dates.add(cal)
-            }
-
-            adapter!!.differ.submitList(dates)
-
-            calendarViewModel.updateCurrentSelect(Date())
-
-        }
-
     }
 
     private fun checkHasRecord(date: Date): Boolean {
-        val filterDate = calendarValidRecords.filter { d ->
+        val filterDate = recordDates.filter { d ->
             DateUtil.differDates(d, date)
         }
 
@@ -281,6 +256,7 @@ class HistoryFragment : Fragment() {
         }
 
         calendarViewModel.updateCurrentCalendar(calendar.time)
+//        recordViewModel.loadRecords(date)
     }
 
     private fun updateCalendar(date: Date) {
@@ -293,7 +269,7 @@ class HistoryFragment : Fragment() {
 
         for (i in 1 until lastDay + 1) {
             calendar.set(Calendar.DAY_OF_MONTH, i)
-            val calData = if (DateUtil.differDates(currentSelectDay, calendar.time)) {
+            val calData = if (DateUtil.differDates(selectedDate, calendar.time)) {
                 CalendarData(calendar.time, true)
             } else {
                 CalendarData(calendar.time, false)
@@ -301,14 +277,28 @@ class HistoryFragment : Fragment() {
             list.add(calData)
         }
 
-
-
         adapter!!.differ.submitList(list)
 
-        updateCalendarUI(calendar)
+        val dates = mutableListOf<CalendarData>()
+
+        CoroutineScope(Dispatchers.Main).launch {
+
+            recordDates = getMonthRecordDates(calendar.time)
+
+            for (i in 1 until lastDay + 1) {
+                calendar.set(Calendar.DAY_OF_MONTH, i)
+                val cal = CalendarData(calendar.time, isSelected = false, hasRecord = checkHasRecord(calendar.time))
+                dates.add(cal)
+            }
+
+            adapter!!.differ.submitList(dates)
+
+            calendarViewModel.updateCurrentSelect(selectedDate)
+        }
 
         Handler(Looper.getMainLooper()).postDelayed( { scrollToCenter(scrollPosition) }, 100)
 
+        updateUI(date)
     }
 
     private fun updateUI(date: Date) {
@@ -335,7 +325,6 @@ class HistoryFragment : Fragment() {
         val recordList = mutableListOf<Record>()
         recordList.addAll(list)
         recordAdapter.differ.submitList(recordList)
-
     }
 
     private fun showBottomDialog(record: Record) {
