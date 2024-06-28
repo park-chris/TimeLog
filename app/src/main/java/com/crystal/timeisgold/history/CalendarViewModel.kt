@@ -10,15 +10,15 @@ class CalendarViewModel: ViewModel() {
     private val _currentCalendarDate = MutableLiveData<Date>()
     val currentCalendarDate: LiveData<Date> = _currentCalendarDate
 
-    private val _currentSelectDay = MutableLiveData<Date>()
-    val currentSelectDay: LiveData<Date> = _currentSelectDay
+    private val _selectDay = MutableLiveData<Date>()
+    val selectDay: LiveData<Date> = _selectDay
 
     fun updateCurrentCalendar(date: Date) {
         _currentCalendarDate.value = date
     }
 
     fun updateCurrentSelect(date: Date) {
-        _currentSelectDay.value = date
+        _selectDay.value = date
     }
 
     companion object {

@@ -47,7 +47,7 @@ class HistoryFragment : Fragment() {
     private var calendarDate: Date = Date()
     private var selectedDate: Date = Date()
     private var recordDates = emptyList<Date>()
-
+    private var calendarDates = emptyList<CalendarData>()
 
     private val calendarViewModel = CalendarViewModel.getCalendarViewModelInstance()
     private val recordViewModel by lazy {
@@ -84,21 +84,29 @@ class HistoryFragment : Fragment() {
 
         calendarViewModel.currentCalendarDate.observe(viewLifecycleOwner) {
             it?.let {
+                Log.e(TAG, "currentCalendarDate $it")
                 calendarDate = it
+                selectedDate = it
                 updateCalendar(it)
+//                updateSelectedCalendar(it)
+                updateUI(it)
             }
         }
 
-        calendarViewModel.currentSelectDay.observe(viewLifecycleOwner) {
+        calendarViewModel.selectDay.observe(viewLifecycleOwner) {
             it?.let {
+                Log.e(TAG, "currentSelectDay $it")
+
                 selectedDate = it
-                updateSelectedCalendar(it)
+//                updateSelectedCalendar(it)
+                updateCalendar(it)
+                updateUI(it)
                 recordViewModel.loadRecords(it)
             }
         }
 
         recordViewModel.selectedRecordsLiveData.observe(viewLifecycleOwner) {
-            Log.e("TestLog", "list $it")
+            Log.e("TestLog", "updateRecord list $it")
             updateRecord(it)
             if (it.isEmpty()) {
                 binding.infoTextView.visibility = View.VISIBLE
@@ -112,8 +120,11 @@ class HistoryFragment : Fragment() {
 
         binding.todayButton.setOnClickListener {
             val calendar = Calendar.getInstance()
+            selectedDate = calendar.time
             scrollPosition = calendar.get(Calendar.DAY_OF_MONTH)
-            calendarViewModel.updateCurrentSelect(calendar.time)
+
+
+//            calendarViewModel.updateCurrentSelect(calendar.time)
             calendarViewModel.updateCurrentCalendar(calendar.time)
         }
 
@@ -128,7 +139,12 @@ class HistoryFragment : Fragment() {
         binding.yearMonthLayout.setOnClickListener {
             showDatePicker { date ->
                 calendarViewModel.updateCurrentSelect(date)
-                calendarViewModel.updateCurrentCalendar(date)
+//                calendarViewModel.updateCurrentCalendar(date)
+
+                scrollPosition = selectedDate.date
+                Log.e(TAG, "scrollToposition $scrollPosition")
+                Handler(Looper.getMainLooper()).postDelayed( { scrollToCenter(scrollPosition) }, 100)
+
                 recordViewModel.loadRecords(date)
             }
         }
@@ -206,7 +222,7 @@ class HistoryFragment : Fragment() {
 
         val calendar = Calendar.getInstance()
 
-        scrollPosition = calendar.get(Calendar.DAY_OF_MONTH)
+        selectedDate = calendar.time
         calendarViewModel.updateCurrentCalendar(calendar.time)
     }
 
@@ -256,7 +272,7 @@ class HistoryFragment : Fragment() {
         }
 
         calendarViewModel.updateCurrentCalendar(calendar.time)
-//        recordViewModel.loadRecords(date)
+
     }
 
     private fun updateCalendar(date: Date) {
@@ -287,18 +303,22 @@ class HistoryFragment : Fragment() {
 
             for (i in 1 until lastDay + 1) {
                 calendar.set(Calendar.DAY_OF_MONTH, i)
-                val cal = CalendarData(calendar.time, isSelected = false, hasRecord = checkHasRecord(calendar.time))
-                dates.add(cal)
+                val calData = if (DateUtil.differDates(selectedDate, calendar.time)) {
+                    CalendarData(calendar.time, true, checkHasRecord(calendar.time))
+                } else {
+                    CalendarData(calendar.time, false)
+                }
+                dates.add(calData)
             }
 
             adapter!!.differ.submitList(dates)
-
-            calendarViewModel.updateCurrentSelect(selectedDate)
         }
 
-        Handler(Looper.getMainLooper()).postDelayed( { scrollToCenter(scrollPosition) }, 100)
+        scrollPosition = date.date
 
-        updateUI(date)
+        Log.e(TAG," updateCalender scollToPosition $scrollPosition")
+        Handler(Looper.getMainLooper()).postDelayed( { scrollToCenter(scrollPosition) }, 200)
+
     }
 
     private fun updateUI(date: Date) {
@@ -310,14 +330,29 @@ class HistoryFragment : Fragment() {
 
     private fun updateSelectedCalendar(date: Date) {
         adapter ?: return
-        val list = adapter!!.differ.currentList.mapIndexed { _, calData ->
-            val newItem = calData.copy(
-                isSelected = DateUtil.differDates(calData.date, date),
-                hasRecord = checkHasRecord(calData.date)
-            )
-            newItem
+
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+
+        val lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+        val list = mutableListOf<CalendarData>()
+
+        for (i in 1 until lastDay + 1) {
+            calendar.set(Calendar.DAY_OF_MONTH, i)
+            val calData = if (DateUtil.differDates(selectedDate, calendar.time)) {
+                CalendarData(calendar.time, true, checkHasRecord(calendar.time))
+            } else {
+                CalendarData(calendar.time, false)
+            }
+            list.add(calData)
         }
+
         adapter!!.differ.submitList(list)
+
+        scrollPosition = selectedDate.date
+        Log.e(TAG, "scrollToposition $scrollPosition")
+        Handler(Looper.getMainLooper()).postDelayed( { scrollToCenter(scrollPosition) }, 100)
 
     }
 
